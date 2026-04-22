@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESG Carbon Agent</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0f0d;
+    --surface: #111a15;
+    --surface2: #162019;
+    --border: #1e3328;
+    --border2: #254535;
+    --green: #00e87a;
+    --green-dim: #00b860;
+    --green-glow: rgba(0,232,122,0.12);
+    --green-faint: rgba(0,232,122,0.05);
+    --amber: #f5a623;
+    --red: #ff4d4d;
+    --blue: #4da6ff;
+    --text: #e8f5ee;
+    --text-dim: #7a9e8a;
+    --text-muted: #3d6050;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,232,122,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,232,122,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,232,122,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,15,13,0.95);
+    backdrop-filter: blur(8px);
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--green); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--green);
+    box-shadow: 0 0 12px var(--green-glow);
+  }
+  .logo-text { font-size: 15px; font-weight: 800; letter-spacing: 0.04em; }
+  .logo-text span { color: var(--green); }
+
+  .header-status { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--green); }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; box-shadow: 0 0 8px var(--green); }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+  .phase-indicator { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; }
+  .phase-indicator span { color: var(--green); font-weight: 500; }
+
+  .app { position: relative; z-index: 1; display: flex; flex: 1; height: calc(100vh - 57px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 16px 12px; gap: 4px; overflow-y: auto;
+  }
+  .sidebar-label {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+    color: var(--text-muted); text-transform: uppercase;
+    padding: 0 6px; margin: 8px 0 4px;
+  }
+  .sidebar-label:first-child { margin-top: 0; }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--text-dim);
+    transition: all 0.15s; border: 1px solid transparent;
+  }
+  .nav-item:hover { background: var(--green-faint); color: var(--text); border-color: var(--border2); }
+  .nav-item.active { background: var(--green-glow); color: var(--green); border-color: rgba(0,232,122,0.25); }
+  .nav-item .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; font-family: var(--mono); font-size: 9px;
+    padding: 1px 5px; border-radius: 3px;
+    background: rgba(245,166,35,0.15); color: var(--amber); border: 1px solid rgba(245,166,35,0.3);
+  }
+  .nav-badge.green { background: var(--green-glow); color: var(--green); border-color: rgba(0,232,122,0.3); }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .panel.active { display: flex; }
+
+  /* CHAT */
+  .chat-layout { display: flex; flex: 1; overflow: hidden; }
+  .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .chat-context { width: 260px; flex-shrink: 0; border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+
+  .context-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .context-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .context-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; font-size: 11px; }
+  .context-key { color: var(--text-muted); }
+  .context-val { color: var(--text); text-align: right; font-weight: 600; font-family: var(--mono); font-size: 10px; max-width: 120px; word-break: break-word; }
+  .context-val.green { color: var(--green); }
+  .context-val.amber { color: var(--amber); }
+
+  .phase-pipeline { padding: 14px 16px; }
+  .pipeline-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .pipeline-step { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 11px; }
+  .pipe-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid var(--text-muted); }
+  .pipe-dot.done { background: var(--green); border-color: var(--green); box-shadow: 0 0 6px var(--green); }
+  .pipe-dot.active { background: var(--amber); border-color: var(--amber); box-shadow: 0 0 6px var(--amber); animation: pulse 1.5s infinite; }
+  .pipe-dot.pending { border-color: var(--border2); }
+  .pipe-label { color: var(--text-dim); }
+  .pipe-label.done { color: var(--green); }
+  .pipe-label.active { color: var(--amber); }
+  .pipe-line { width: 1px; height: 10px; background: var(--border2); margin-left: 3px; margin-top: -2px; margin-bottom: -2px; }
+
+  /* MESSAGES */
+  .messages { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .msg { display: flex; gap: 12px; animation: fadeSlide 0.3s ease; }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg-avatar { width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; margin-top: 2px; }
+  .msg-avatar.agent { background: var(--green-glow); border: 1px solid rgba(0,232,122,0.3); color: var(--green); }
+  .msg-avatar.user { background: var(--surface2); border: 1px solid var(--border2); color: var(--text-dim); }
+
+  .msg-content { flex: 1; min-width: 0; }
+  .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+  .msg-name { font-size: 12px; font-weight: 700; letter-spacing: 0.02em; }
+  .msg-name.agent { color: var(--green); }
+  .msg-name.user { color: var(--text-dim); }
+  .msg-time { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+  .msg-body { font-size: 13px; line-height: 1.65; color: var(--text); }
+  .msg-body p { margin-bottom: 8px; }
+  .msg-body p:last-child { margin-bottom: 0; }
+  .msg-body code { font-family: var(--mono); font-size: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; color: var(--green); }
+
+  .tool-block { margin: 8px 0; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; font-family: var(--mono); font-size: 11px; }
+  .tool-header { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .tool-name { color: var(--green-dim); font-weight: 500; }
+  .tool-status { margin-left: auto; font-size: 9px; padding: 1px 6px; border-radius: 3px; }
+  .tool-status.running { background: rgba(245,166,35,0.1); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); animation: pulse 1s infinite; }
+  .tool-status.done { background: var(--green-faint); color: var(--green); border: 1px solid rgba(0,232,122,0.2); }
+  .tool-body { padding: 8px 10px; color: var(--text-dim); font-size: 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+  .typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+  .typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--green-dim); animation: typing 1.2s ease-in-out infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(-4px);opacity:1} }
+
+  /* INPUT */
+  .input-bar { padding: 14px 20px; border-top: 1px solid var(--border); background: rgba(10,15,13,0.9); backdrop-filter: blur(8px); }
+  .mode-pills { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .mode-pill { font-family: var(--mono); font-size: 10px; padding: 3px 9px; border-radius: 100px; cursor: pointer; border: 1px solid var(--border2); color: var(--text-muted); transition: all 0.15s; white-space: nowrap; }
+  .mode-pill:hover { border-color: var(--green-dim); color: var(--green); background: var(--green-faint); }
+  .mode-pill.active { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+  textarea { flex: 1; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 13px; padding: 10px 14px; resize: none; outline: none; min-height: 42px; max-height: 120px; line-height: 1.5; transition: border-color 0.15s; }
+  textarea:focus { border-color: var(--green-dim); }
+  textarea::placeholder { color: var(--text-muted); }
+  .send-btn { width: 42px; height: 42px; border-radius: 8px; background: var(--green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; flex-shrink: 0; color: #0a0f0d; font-weight: 700; }
+  .send-btn:hover { background: #00ff88; transform: scale(1.03); box-shadow: 0 0 16px var(--green-glow); }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* PANELS */
+  .panel-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-size: 16px; font-weight: 800; letter-spacing: 0.02em; }
+  .panel-title span { color: var(--green); }
+  .panel-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; transition: border-color 0.2s; }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-sub { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+
+  .table-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .table-title { padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-dim); background: var(--surface); border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 8px 16px; text-align: left; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  td { padding: 10px 16px; font-size: 12px; border-bottom: 1px solid rgba(30,51,40,0.5); color: var(--text); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--green-faint); }
+
+  .badge { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+  .badge-green { background: var(--green-faint); color: var(--green); border: 1px solid rgba(0,232,122,0.2); }
+  .badge-amber { background: rgba(245,166,35,0.08); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+  .badge-red { background: rgba(255,77,77,0.08); color: var(--red); border: 1px solid rgba(255,77,77,0.2); }
+  .badge-blue { background: rgba(77,166,255,0.08); color: var(--blue); border: 1px solid rgba(77,166,255,0.2); }
+  .score-chip { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--green); }
+
+  .alert-item { display: flex; gap: 12px; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; border: 1px solid; }
+  .alert-item.critical { background: rgba(255,77,77,0.05); border-color: rgba(255,77,77,0.2); }
+  .alert-item.warning { background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
+  .alert-item.info { background: var(--green-faint); border-color: rgba(0,232,122,0.15); }
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .alert-dot.critical { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .alert-dot.warning { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .alert-dot.info { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .alert-title { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .alert-item.critical .alert-title { color: var(--red); }
+  .alert-item.warning .alert-title { color: var(--amber); }
+  .alert-item.info .alert-title { color: var(--green); }
+  .alert-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+
+  .action-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border2); color: var(--text-dim); cursor: pointer; background: transparent; transition: all 0.15s; }
+  .action-btn:hover { border-color: var(--green-dim); color: var(--green); background: var(--green-faint); }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <div class="logo-text">ESG<span>Carbon</span> Agent</div>
+  </div>
+  <div class="phase-indicator" id="phaseLabel">MODE: <span>STANDBY</span></div>
+  <div class="header-status">
+    <div class="pulse"></div>
+    AGENT ONLINE
+  </div>
+</header>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-label">Agent</div>
+    <div class="nav-item active" onclick="showPanel('chat',this)"><span class="nav-icon">⚡</span> Command Center</div>
+    <div class="sidebar-label">Phases</div>
+    <div class="nav-item" onclick="showPanel('research',this)"><span class="nav-icon">🔬</span> Project Research <span class="nav-badge green">4</span></div>
+    <div class="nav-item" onclick="showPanel('portfolio',this)"><span class="nav-icon">◈</span> Portfolio <span class="nav-badge green">3</span></div>
+    <div class="nav-item" onclick="showPanel('docs',this)"><span class="nav-icon">📄</span> Documents <span class="nav-badge amber">1</span></div>
+    <div class="nav-item" onclick="showPanel('monitor',this)"><span class="nav-icon">📡</span> Monitoring</div>
+    <div class="sidebar-label">System</div>
+    <div class="nav-item" onclick="clearChat()"><span class="nav-icon">↺</span> Reset Session</div>
+  </nav>
+
+  <main class="main">
+
+    <!-- CHAT PANEL -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-layout">
+        <div class="chat-main">
+          <div class="messages" id="messages"></div>
+          <div class="input-bar">
+            <div class="mode-pills">
+              <div class="mode-pill active" onclick="setMode(this,'full-deploy')">⚡ Full Deploy</div>
+              <div class="mode-pill" onclick="setMode(this,'research-only')">🔬 Research</div>
+              <div class="mode-pill" onclick="setMode(this,'portfolio-only')">◈ Portfolio</div>
+              <div class="mode-pill" onclick="setMode(this,'docs-only')">📄 Docs</div>
+              <div class="mode-pill" onclick="setMode(this,'monitoring-only')">📡 Monitor</div>
+              <div class="mode-pill" onclick="setMode(this,'monthly-run')">📊 Monthly Run</div>
+            </div>
+            <div class="input-row">
+              <textarea id="input" rows="1" placeholder="Describe your client, project, or task..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+              <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="chat-context">
+          <div class="context-section">
+            <div class="context-title">Session Context</div>
+            <div class="context-item"><span class="context-key">Client</span><span class="context-val green" id="ctx-client">—</span></div>
+            <div class="context-item"><span class="context-key">Mode</span><span class="context-val amber" id="ctx-mode">full-deploy</span></div>
+            <div class="context-item"><span class="context-key">Volume</span><span class="context-val" id="ctx-volume">—</span></div>
+            <div class="context-item"><span class="context-key">Budget</span><span class="context-val" id="ctx-budget">—</span></div>
+            <div class="context-item"><span class="context-key">Framework</span><span class="context-val" id="ctx-framework">—</span></div>
+          </div>
+          <div class="phase-pipeline">
+            <div class="pipeline-title">Phase Pipeline</div>
+            <div class="pipeline-step"><div class="pipe-dot pending" id="dot-research"></div><div class="pipe-label" id="lbl-research">Research</div></div>
+            <div class="pipe-line"></div>
+            <div class="pipeline-step"><div class="pipe-dot pending" id="dot-portfolio"></div><div class="pipe-label" id="lbl-portfolio">Portfolio</div></div>
+            <div class="pipe-line"></div>
+            <div class="pipeline-step"><div class="pipe-dot pending" id="dot-docs"></div><div class="pipe-label" id="lbl-docs">Docs</div></div>
+            <div class="pipe-line"></div>
+            <div class="pipeline-step"><div class="pipe-dot pending" id="dot-monitor"></div><div class="pipe-label" id="lbl-monitor">Monitoring</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESEARCH PANEL -->
+    <div class="panel" id="panel-research">
+      <div class="panel-header"><div class="panel-title">Project <span>Research</span></div></div>
+      <div class="panel-body">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Evaluated</div><div class="stat-value">7</div><div class="stat-sub">projects reviewed</div></div>
+          <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value green">4</div><div class="stat-sub">score ≥ 35/50</div></div>
+          <div class="stat-card"><div class="stat-label">Red Flags</div><div class="stat-value amber">2</div><div class="stat-sub">require review</div></div>
+          <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value">1</div><div class="stat-sub">score &lt; 25/50</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-title">Research Results</div>
+          <table>
+            <thead><tr><th>Project</th><th>Type</th><th>Registry</th><th>Score</th><th>Additionality</th><th>Price/t</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Borneo REDD+ Reserve</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">VCS-1847</span></td><td>REDD+</td><td>Verra</td><td><span class="score-chip">42/50</span></td><td><span class="badge badge-green">STRONG</span></td><td>$14.50</td><td><span class="badge badge-green">APPROVED</span></td></tr>
+              <tr><td><strong>Kenya Cookstoves Initiative</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">GS-12043</span></td><td>Cookstoves</td><td>Gold Standard</td><td><span class="score-chip">38/50</span></td><td><span class="badge badge-green">STRONG</span></td><td>$11.20</td><td><span class="badge badge-green">APPROVED</span></td></tr>
+              <tr><td><strong>Patagonia Blue Carbon</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">VCS-2201</span></td><td>Blue Carbon</td><td>Verra</td><td><span class="score-chip">45/50</span></td><td><span class="badge badge-green">STRONG</span></td><td>$28.00</td><td><span class="badge badge-green">APPROVED</span></td></tr>
+              <tr><td><strong>Maharashtra Solar Grid</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">GS-8834</span></td><td>Renewable</td><td>Gold Standard</td><td><span class="score-chip">36/50</span></td><td><span class="badge badge-amber">MODERATE</span></td><td>$3.80</td><td><span class="badge badge-green">APPROVED</span></td></tr>
+              <tr><td><strong>Amazon Basin REDD</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">VCS-0923</span></td><td>REDD+</td><td>Verra</td><td><span class="score-chip">29/50</span></td><td><span class="badge badge-amber">MODERATE</span></td><td>$7.10</td><td><span class="badge badge-amber">⚠ FLAG</span></td></tr>
+              <tr><td><strong>Sumatra Peatland</strong><br><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">VCS-1102</span></td><td>REDD+</td><td>Verra</td><td><span class="score-chip">18/50</span></td><td><span class="badge badge-red">WEAK</span></td><td>$4.20</td><td><span class="badge badge-red">REJECTED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO PANEL -->
+    <div class="panel" id="panel-portfolio">
+      <div class="panel-header"><div class="panel-title">Portfolio <span>Recommendation</span></div></div>
+      <div class="panel-body">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Volume</div><div class="stat-value green">5,000</div><div class="stat-sub">tCO₂e allocated</div></div>
+          <div class="stat-card"><div class="stat-label">Total Cost</div><div class="stat-value">$72,800</div><div class="stat-sub">within budget</div></div>
+          <div class="stat-card"><div class="stat-label">Blended Price</div><div class="stat-value amber">$14.56</div><div class="stat-sub">per tCO₂e</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Score</div><div class="stat-value green">40.3</div><div class="stat-sub">out of 50</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-title">Selected Portfolio — 3 Projects</div>
+          <table>
+            <thead><tr><th>#</th><th>Project</th><th>Allocation</th><th>Tonnes</th><th>Price</th><th>Cost</th><th>SDGs</th><th>Profile</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="color:var(--green);font-weight:700">01</td>
+                <td><strong>Patagonia Blue Carbon</strong><br><span style="font-size:10px;color:var(--text-muted)">VCS-2201 · Blue Carbon · Chile</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:40%;height:100%;background:var(--green);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">40%</span></div></td>
+                <td>2,000</td><td>$28.00</td><td><strong>$56,000</strong></td>
+                <td><span style="font-size:11px">13 14 15</span></td>
+                <td><span class="badge badge-blue">PREMIUM</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--green);font-weight:700">02</td>
+                <td><strong>Kenya Cookstoves</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-12043 · Cookstoves · Kenya</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:35%;height:100%;background:var(--green-dim);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">35%</span></div></td>
+                <td>1,750</td><td>$11.20</td><td><strong>$19,600</strong></td>
+                <td><span style="font-size:11px">3 5 7 13</span></td>
+                <td><span class="badge badge-green">CORE</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--green);font-weight:700">03</td>
+                <td><strong>Maharashtra Solar</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-8834 · Renewable · India</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:25%;height:100%;background:var(--text-muted);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">25%</span></div></td>
+                <td>1,250</td><td>$3.80</td><td><strong>$4,750</strong></td>
+                <td><span style="font-size:11px">7 8 13</span></td>
+                <td><span class="badge badge-amber">VOLUME</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS PANEL -->
+    <div class="panel" id="panel-docs">
+      <div class="panel-header"><div class="panel-title">Document <span>Generation</span></div></div>
+      <div class="panel-body">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Generated</div><div class="stat-value green">5</div><div class="stat-sub">documents ready</div></div>
+          <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value amber">1</div><div class="stat-sub">awaiting approval</div></div>
+          <div class="stat-card"><div class="stat-label">Frameworks</div><div class="stat-value">2</div><div class="stat-sub">GHG + CDP</div></div>
+          <div class="stat-card"><div class="stat-label">Certificates</div><div class="stat-value green">3</div><div class="stat-sub">retirement certs</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-title">Document Registry</div>
+          <table>
+            <thead><tr><th>Document</th><th>Type</th><th>Project</th><th>Generated</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Purchase Agreement — Patagonia</strong></td><td><span class="badge badge-blue">AGREEMENT</span></td><td>VCS-2201</td><td style="font-family:var(--mono);font-size:10px">2025-01-14</td><td><span class="badge badge-green">SIGNED</span></td></tr>
+              <tr><td><strong>Purchase Agreement — Kenya</strong></td><td><span class="badge badge-blue">AGREEMENT</span></td><td>GS-12043</td><td style="font-family:var(--mono);font-size:10px">2025-01-14</td><td><span class="badge badge-amber">PENDING</span></td></tr>
+              <tr><td><strong>Retirement Certificate — Patagonia</strong></td><td><span class="badge badge-green">CERTIFICATE</span></td><td>VCS-2201</td><td style="font-family:var(--mono);font-size:10px">2025-01-15</td><td><span class="badge badge-green">ISSUED</span></td></tr>
+              <tr><td><strong>GHG Protocol Disclosure FY2024</strong></td><td><span class="badge badge-amber">ESG REPORT</span></td><td>All</td><td style="font-family:var(--mono);font-size:10px">2025-01-16</td><td><span class="badge badge-green">FINAL</span></td></tr>
+              <tr><td><strong>CDP Climate C11 Section</strong></td><td><span class="badge badge-amber">ESG REPORT</span></td><td>All</td><td style="font-family:var(--mono);font-size:10px">2025-01-16</td><td><span class="badge badge-green">FINAL</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONITOR PANEL -->
+    <div class="panel" id="panel-monitor">
+      <div class="panel-header"><div class="panel-title">Monitoring <span>&amp; Alerts</span></div></div>
+      <div class="panel-body">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Active Holdings</div><div class="stat-value green">3</div><div class="stat-sub">projects tracked</div></div>
+          <div class="stat-card"><div class="stat-label">Critical Alerts</div><div class="stat-value" style="color:var(--red)">1</div><div class="stat-sub">action required</div></div>
+          <div class="stat-card"><div class="stat-label">Warnings</div><div class="stat-value amber">2</div><div class="stat-sub">within 14 days</div></div>
+          <div class="stat-card"><div class="stat-label">YTD Retired</div><div class="stat-value green">2,000</div><div class="stat-sub">tCO₂e of 5,000</div></div>
+        </div>
+        <div class="alert-item critical">
+          <div class="alert-dot critical"></div>
+          <div>
+            <div class="alert-title">🔴 Retirement Deadline — 22 Days</div>
+            <div class="alert-desc">Kenya Cookstoves (GS-12043) — 1,750 tCO₂e must be retired by Feb 5, 2025. Initiate registry transfer immediately.<br>Serial range: GS-12043-2022-001 to GS-12043-2022-1750</div>
+            <button class="action-btn">→ Open Registry Portal</button>
+            <button class="action-btn" style="margin-left:6px">→ Generate Checklist</button>
+          </div>
+        </div>
+        <div class="alert-item warning">
+          <div class="alert-dot warning"></div>
+          <div>
+            <div class="alert-title">🟡 Verification Due — 48 Days</div>
+            <div class="alert-desc">Patagonia Blue Carbon (VCS-2201) — Third-party verification window opens March 1. Confirm SCS Global Services engagement status and submit monitoring report by Feb 20.</div>
+            <button class="action-btn">→ Contact Verifier</button>
+          </div>
+        </div>
+        <div class="alert-item warning">
+          <div class="alert-dot warning"></div>
+          <div>
+            <div class="alert-title">🟡 Annual ESG Report Deadline — 38 Days</div>
+            <div class="alert-desc">CDP Climate submission window closes Feb 28. GHG Protocol disclosure and CDP C11 section are ready — awaiting final sign-off from ESG Director.</div>
+            <button class="action-btn">→ Review Documents</button>
+          </div>
+        </div>
+        <div class="alert-item info">
+          <div class="alert-dot info"></div>
+          <div>
+            <div class="alert-title">✅ Verification Complete — Maharashtra Solar</div>
+            <div class="alert-desc">GS-8834 successfully re-verified by Bureau Veritas on Jan 12. 1,250 tCO₂e confirmed. No methodology changes. Price up 8% vs. purchase.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+const SYSTEM_PROMPT = `You are the ESG Carbon Agent — a professional AI system for automated carbon credit lifecycle management. You operate across four specialized phases:
+
+1. RESEARCH: Analyze carbon credit projects using structured due diligence. Score projects on methodology (0-10), additionality (0-10), co-benefits (0-10), vintage quality (0-10), and price fairness (0-10). Total score out of 50.
+
+2. PORTFOLIO: Construct optimized portfolios of 3-5 projects balancing impact, quality, and price. Enforce diversification rules and match client ESG frameworks.
+
+3. DOCUMENTATION: Generate purchase agreements, retirement certificates, and ESG disclosure sections (GHG Protocol, CDP, GRI, SBTi).
+
+4. MONITORING: Track deadlines, send alerts, and generate monthly performance reports.
+
+Execution modes: full-deploy, research-only, portfolio-only, docs-only, monitoring-only, monthly-run.
+
+Rules:
+- Always be structured and professional. Use tables, scores, and clear recommendations.
+- For research, produce a score card with all 5 dimensions.
+- For portfolio, recommend 3-5 projects with allocation percentages.
+- For documentation, describe what would be generated in detail.
+- For monitoring, produce alert summaries with clear action items.
+- Extract client details (name, volume, budget, framework) and reference them throughout.
+- Use correct carbon market terminology: additionality, vintage, buffer pool, crediting period, retirement, serial numbers, Verra/Gold Standard.
+- Format responses clearly with headers and structured data. Keep responses focused and actionable.
+- Never make up registry transaction IDs or serial numbers for real retirements.`;
+
+let conversationHistory = [];
+let currentMode = 'full-deploy';
+let isLoading = false;
+let sessionContext = { client: null, mode: 'full-deploy', volume: null, budget: null, framework: null };
+let phaseState = { research: 'pending', portfolio: 'pending', docs: 'pending', monitor: 'pending' };
+
+function getTime() {
+  return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function setMode(el, mode) {
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentMode = mode;
+  sessionContext.mode = mode;
+  document.getElementById('ctx-mode').textContent = mode;
+  document.getElementById('phaseLabel').innerHTML = 'MODE: <span>' + mode.toUpperCase() + '</span>';
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMessage(role, content) {
+  const messages = document.getElementById('messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg';
+  const isAgent = role === 'agent';
+  msg.innerHTML = `
+    <div class="msg-avatar ${isAgent ? 'agent' : 'user'}">${isAgent ? '⬡' : '✦'}</div>
+    <div class="msg-content">
+      <div class="msg-header">
+        <span class="msg-name ${isAgent ? 'agent' : 'user'}">${isAgent ? 'ESG AGENT' : 'YOU'}</span>
+        <span class="msg-time">${getTime()}</span>
+      </div>
+      <div class="msg-body"><p>${formatContent(content)}</p></div>
+    </div>`;
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+  return msg;
+}
+
+function formatContent(text) {
+  if (!text) return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+}
+
+function addTyping() {
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg'; div.id = 'typing-indicator';
+  div.innerHTML = `<div class="msg-avatar agent">⬡</div><div class="msg-content"><div class="msg-header"><span class="msg-name agent">ESG AGENT</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function addToolBlock(toolName, input) {
+  const messages = document.getElementById('messages');
+  const lastMsg = messages.lastElementChild;
+  if (!lastMsg) return;
+  const body = lastMsg.querySelector('.msg-body');
+  if (!body) return;
+  const icons = { 'web_search': '🔍', 'web_fetch': '🌐' };
+  const div = document.createElement('div');
+  div.className = 'tool-block';
+  div.innerHTML = `<div class="tool-header"><span class="tool-icon">${icons[toolName] || '⚙'}</span><span class="tool-name">${toolName}</span><span class="tool-status done">DONE</span></div><div class="tool-body">${typeof input === 'object' ? JSON.stringify(input, null, 2) : input}</div>`;
+  body.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function updateContext(text) {
+  const clientMatch = text.match(/(?:client|company|for)\s+(?:is\s+)?([A-Z][a-zA-Z\s&]+?)(?:\s+is|\s*,|\s*\.|\s*\n|$)/);
+  if (clientMatch && !sessionContext.client) { sessionContext.client = clientMatch[1].trim().slice(0, 20); document.getElementById('ctx-client').textContent = sessionContext.client; }
+  const volMatch = text.match(/(\d[\d,]+)\s*(?:tonnes?|tCO₂e|t\s*CO)/i);
+  if (volMatch) { sessionContext.volume = volMatch[1] + ' t'; document.getElementById('ctx-volume').textContent = sessionContext.volume; }
+  const budgetMatch = text.match(/\$\s*([\d,]+(?:k|K|m|M)?)/);
+  if (budgetMatch) { sessionContext.budget = '$' + budgetMatch[1]; document.getElementById('ctx-budget').textContent = sessionContext.budget; }
+  const fwMatch = text.match(/\b(GHG Protocol|CDP|GRI|SBTi|TCFD)\b/i);
+  if (fwMatch) { sessionContext.framework = fwMatch[1]; document.getElementById('ctx-framework').textContent = sessionContext.framework; }
+}
+
+function advancePhase(text) {
+  const lower = text.toLowerCase();
+  if (lower.includes('score') && lower.includes('/50') || lower.includes('additionality')) { setPhase('research', 'done'); if (currentMode === 'full-deploy') setPhase('portfolio', 'active'); }
+  if (lower.includes('portfolio') && (lower.includes('allocation') || lower.includes('%'))) { setPhase('portfolio', 'done'); if (currentMode === 'full-deploy') setPhase('docs', 'active'); }
+  if (lower.includes('purchase agreement') || lower.includes('retirement certificate')) { setPhase('docs', 'done'); if (currentMode === 'full-deploy') setPhase('monitor', 'active'); }
+  if (lower.includes('monitoring') || lower.includes('alert') || lower.includes('deadline')) { setPhase('monitor', 'done'); }
+}
+
+function setPhase(phase, state) {
+  phaseState[phase] = state;
+  document.getElementById('dot-' + phase).className = 'pipe-dot ' + state;
+  document.getElementById('lbl-' + phase).className = 'pipe-label ' + state;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = ''; input.style.height = 'auto';
+  isLoading = true; document.getElementById('sendBtn').disabled = true;
+  updateContext(text);
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: `[Mode: ${currentMode}]\n\n${text}` });
+  addTyping();
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+      })
+    });
+    const data = await response.json();
+    removeTyping();
+    let fullText = '';
+    const toolCalls = [];
+    if (data.content) {
+      for (const block of data.content) { if (block.type === 'tool_use') toolCalls.push(block); }
+      for (const block of data.content) { if (block.type === 'text') fullText += block.text; }
+    }
+    if (fullText || toolCalls.length > 0) {
+      addMessage('agent', fullText || '');
+      for (const tool of toolCalls) addToolBlock(tool.name, tool.input);
+      updateContext(fullText);
+      advancePhase(fullText);
+    }
+    conversationHistory.push({ role: 'assistant', content: data.content || [{ type: 'text', text: fullText }] });
+  } catch (err) {
+    removeTyping();
+    addMessage('agent', `⚠ Connection error: ${err.message}`);
+  }
+  isLoading = false; document.getElementById('sendBtn').disabled = false;
+  document.getElementById('input').focus();
+}
+
+function clearChat() {
+  conversationHistory = []; sessionContext = { client: null, mode: currentMode, volume: null, budget: null, framework: null };
+  phaseState = { research: 'pending', portfolio: 'pending', docs: 'pending', monitor: 'pending' };
+  ['research','portfolio','docs','monitor'].forEach(p => setPhase(p, 'pending'));
+  ['ctx-client','ctx-volume','ctx-budget','ctx-framework'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('messages').innerHTML = '';
+  addWelcome();
+}
+
+function addWelcome() {
+  const messages = document.getElementById('messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg';
+  msg.innerHTML = `
+    <div class="msg-avatar agent">⬡</div>
+    <div class="msg-content">
+      <div class="msg-header"><span class="msg-name agent">ESG AGENT</span><span class="msg-time">${getTime()}</span></div>
+      <div class="msg-body">
+        <p><strong>ESG Carbon Agent online.</strong> Automated carbon credit retirement system — covering the full lifecycle from project research through monitoring.</p>
+        <p>Select an execution mode above, then describe your client or task:</p>
+        <p>
+          <code>Research the Borneo REDD+ project VCS-1847 for a 2,000 tonne purchase</code><br>
+          <code>Build a balanced portfolio for Acme Corp — $80k budget, GHG Protocol, 5,000 tCO₂e</code><br>
+          <code>Generate a retirement certificate for VCS-2201, 2,000 tonnes, Acme Corp</code><br>
+          <code>Run monthly monitoring for our active portfolio and flag upcoming deadlines</code>
+        </p>
+      </div>
+    </div>`;
+  messages.appendChild(msg);
+}
+
+addWelcome();
+</script>
+</body>
+</html>
