@@ -7,8 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
-
-:root {
+:root{
   --bg:#0a0f0d;--surface:#111a15;--surface2:#162019;
   --border:#1e3328;--border2:#254535;
   --green:#00e87a;--green-dim:#00b860;
@@ -21,19 +20,23 @@
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,232,122,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,122,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 body::after{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,232,122,.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
-
 /* HEADER */
 header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(10,15,13,.95);backdrop-filter:blur(8px);flex-shrink:0;}
 .logo{display:flex;align-items:center;gap:10px;}
 .logo-icon{width:32px;height:32px;border:1.5px solid var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green);box-shadow:0 0 12px var(--green-glow);}
 .logo-text{font-size:15px;font-weight:800;letter-spacing:.04em;}
 .logo-text span{color:var(--green);}
+.header-right{display:flex;align-items:center;gap:14px;}
 .header-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green);}
 .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;box-shadow:0 0 8px var(--green);}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 .phase-indicator{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:.08em;}
 .phase-indicator span{color:var(--green);font-weight:500;}
-
+/* LANGUAGE TOGGLE */
+.lang-toggle{display:flex;align-items:center;gap:2px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:3px;flex-shrink:0;}
+.lang-btn{font-family:var(--mono);font-size:11px;font-weight:500;padding:4px 12px;border-radius:16px;border:none;cursor:pointer;transition:all .2s;background:transparent;color:var(--text-muted);letter-spacing:.04em;white-space:nowrap;}
+.lang-btn.active{background:var(--green);color:#0a0f0d;font-weight:700;box-shadow:0 0 8px var(--green-glow);}
+.lang-btn:not(.active):hover{color:var(--text);background:var(--border2);}
 /* LAYOUT */
 .app{position:relative;z-index:1;display:flex;flex:1;height:calc(100vh - 57px);overflow:hidden;}
 .sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 12px;gap:4px;overflow-y:auto;}
@@ -49,7 +52,6 @@ header{position:relative;z-index:10;display:flex;align-items:center;justify-cont
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .panel{display:none;flex-direction:column;flex:1;overflow:hidden;}
 .panel.active{display:flex;}
-
 /* CHAT */
 .chat-layout{display:flex;flex:1;overflow:hidden;}
 .chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -118,10 +120,9 @@ textarea::placeholder{color:var(--text-muted);}
 .send-btn{width:42px;height:42px;border-radius:8px;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;flex-shrink:0;color:#0a0f0d;font-weight:700;}
 .send-btn:hover{background:#00ff88;transform:scale(1.03);box-shadow:0 0 16px var(--green-glow);}
 .send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-
-/* ═══ STARTER PACKAGE ═══ */
+/* STARTER */
 .starter-steps{display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--border);background:rgba(10,15,13,.6);flex-shrink:0;}
-.starter-step{display:flex;align-items:center;gap:8px;padding:12px 16px 12px 0;font-family:var(--mono);font-size:11px;color:var(--text-muted);position:relative;}
+.starter-step{display:flex;align-items:center;gap:8px;padding:12px 16px 12px 0;font-family:var(--mono);font-size:11px;color:var(--text-muted);}
 .starter-step::after{content:'›';margin-left:16px;color:var(--border2);}
 .starter-step:last-child::after{display:none;}
 .step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:1px solid var(--border2);color:var(--text-muted);flex-shrink:0;}
@@ -137,7 +138,8 @@ textarea::placeholder{color:var(--text-muted);}
 .form-section-sub{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:16px;}
 .field-group{margin-bottom:16px;}
 .field-label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
-.field-label span{color:var(--teal);}
+.field-label .req{color:var(--teal);}
+.field-label .opt{color:var(--text-muted);}
 .field-input,.field-select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:10px 14px;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;}
 .field-input:focus,.field-select:focus{border-color:var(--teal);}
 .field-input::placeholder{color:var(--text-muted);}
@@ -178,11 +180,11 @@ textarea::placeholder{color:var(--text-muted);}
 .credit-card.selected{border-color:var(--green);background:var(--green-faint);}
 .credit-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#0a0f0d;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center;}
 .credit-card.selected .credit-check{display:flex;}
+.credit-flag{font-size:16px;margin-bottom:6px;}
 .credit-name{font-size:12px;font-weight:700;margin-bottom:4px;}
 .credit-price{font-family:var(--mono);font-size:20px;font-weight:400;color:var(--green);}
 .credit-price span{font-size:11px;color:var(--text-muted);}
 .credit-type{font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:4px;}
-.credit-flag{font-size:16px;margin-bottom:6px;}
 .tx-success{background:var(--green-faint);border:1px solid rgba(0,232,122,.3);border-radius:10px;padding:16px;animation:fadeSlide .4s ease;}
 .tx-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px;}
 .tx-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;}
@@ -195,16 +197,14 @@ textarea::placeholder{color:var(--text-muted);}
 .pm-value{font-size:15px;font-weight:700;}
 .pm-value.teal{color:var(--teal);}
 .pm-value.green{color:var(--green);}
-.pm-value.amber{color:var(--amber);}
-
+.meth-box{font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:1.7;background:var(--surface2);padding:12px;border-radius:6px;border:1px solid var(--border);}
 /* OTHER PANELS */
 .panel-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .panel-title{font-size:16px;font-weight:800;letter-spacing:.02em;}
 .panel-title span{color:var(--green);}
 .panel-body{flex:1;overflow-y:auto;padding:20px 24px;}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color .2s;}
-.stat-card:hover{border-color:var(--border2);}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
 .stat-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
 .stat-value{font-size:22px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px;}
 .stat-value.green{color:var(--green);}
@@ -222,7 +222,6 @@ tr:hover td{background:var(--green-faint);}
 .badge-amber{background:rgba(245,166,35,.08);color:var(--amber);border:1px solid rgba(245,166,35,.2);}
 .badge-red{background:rgba(255,77,77,.08);color:var(--red);border:1px solid rgba(255,77,77,.2);}
 .badge-blue{background:rgba(77,166,255,.08);color:var(--blue);border:1px solid rgba(77,166,255,.2);}
-.badge-teal{background:rgba(0,212,200,.08);color:var(--teal);border:1px solid rgba(0,212,200,.2);}
 .score-chip{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--green);}
 .alert-item{display:flex;gap:12px;padding:12px 16px;border-radius:8px;margin-bottom:10px;border:1px solid;}
 .alert-item.critical{background:rgba(255,77,77,.05);border-color:rgba(255,77,77,.2);}
@@ -242,34 +241,10 @@ tr:hover td{background:var(--green-faint);}
 .divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-
-/* LANGUAGE TOGGLE */
-.lang-toggle{
-  display:flex;align-items:center;gap:2px;
-  background:var(--surface2);
-  border:1px solid var(--border2);
-  border-radius:20px;padding:3px;
-  flex-shrink:0;
-}
-.lang-btn{
-  font-family:var(--mono);font-size:11px;font-weight:500;
-  padding:4px 11px;border-radius:16px;
-  border:none;cursor:pointer;
-  transition:all .2s;
-  background:transparent;color:var(--text-muted);
-  letter-spacing:.04em;
-}
-.lang-btn.active{
-  background:var(--green);color:#0a0f0d;
-  box-shadow:0 0 8px var(--green-glow);
-  font-weight:700;
-}
-.lang-btn:not(.active):hover{color:var(--text);background:var(--border2);}
-
-/* PDF TEMPLATE */
+/* PDF */
 #pdf-report{display:none;position:fixed;left:-9999px;top:0;width:794px;font-family:Arial,sans-serif;background:#fff;color:#111;padding:48px;font-size:13px;line-height:1.6;}
 #pdf-report .r-header{border-bottom:4px solid #1A3C2E;padding-bottom:20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end;}
-#pdf-report .r-logo{font-size:22px;font-weight:800;color:#1A3C2E;letter-spacing:.04em;}
+#pdf-report .r-logo{font-size:22px;font-weight:800;color:#1A3C2E;}
 #pdf-report .r-logo span{color:#00b860;}
 #pdf-report .r-meta{font-size:11px;color:#5A7A6A;text-align:right;line-height:1.8;}
 #pdf-report h1{font-size:20px;font-weight:700;color:#1A3C2E;margin-bottom:4px;}
@@ -297,28 +272,28 @@ tr:hover td{background:var(--green-faint);}
 <header>
   <div class="logo"><div class="logo-icon">⬡</div><div class="logo-text">ESG<span>Carbon</span> Agent</div></div>
   <div class="phase-indicator" id="phaseLabel">MODE: <span>STANDBY</span></div>
-  <div style="display:flex;align-items:center;gap:14px;">
+  <div class="header-right">
     <div class="lang-toggle">
       <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
       <button class="lang-btn" id="btn-ja" onclick="setLang('ja')">日本語</button>
     </div>
-    <div class="header-status"><div class="pulse"></div><span id="hdr-status">AGENT ONLINE</span></div>
+    <div class="header-status"><div class="pulse"></div><span id="status-text">AGENT ONLINE</span></div>
   </div>
 </header>
 
 <div class="app">
 <nav class="sidebar">
-  <div class="sidebar-label">Agent</div>
-  <div class="nav-item active" onclick="showPanel('chat',this)"><span class="nav-icon">⚡</span> Command Center</div>
-  <div class="sidebar-label">Tools</div>
-  <div class="nav-item" id="starter-nav" onclick="showPanel('starter',this)"><span class="nav-icon">🌱</span> Starter Package <span class="nav-badge teal">SMB</span></div>
-  <div class="sidebar-label">Phases</div>
-  <div class="nav-item" onclick="showPanel('research',this)"><span class="nav-icon">🔬</span> Project Research <span class="nav-badge green">4</span></div>
-  <div class="nav-item" onclick="showPanel('portfolio',this)"><span class="nav-icon">◈</span> Portfolio <span class="nav-badge green">3</span></div>
-  <div class="nav-item" onclick="showPanel('docs',this)"><span class="nav-icon">📄</span> Documents <span class="nav-badge amber">1</span></div>
-  <div class="nav-item" onclick="showPanel('monitor',this)"><span class="nav-icon">📡</span> Monitoring</div>
-  <div class="sidebar-label">System</div>
-  <div class="nav-item" onclick="clearChat()"><span class="nav-icon">↺</span> Reset Session</div>
+  <div class="sidebar-label" data-i18n="navAgent">Agent</div>
+  <div class="nav-item active" onclick="showPanel('chat',this)"><span class="nav-icon">⚡</span><span data-i18n="cmdCenter">Command Center</span></div>
+  <div class="sidebar-label" data-i18n="navTools">Tools</div>
+  <div class="nav-item" id="starter-nav" onclick="showPanel('starter',this)"><span class="nav-icon">🌱</span><span data-i18n="starterPkg">Starter Package</span><span class="nav-badge teal">SMB</span></div>
+  <div class="sidebar-label" data-i18n="navPhases">Phases</div>
+  <div class="nav-item" onclick="showPanel('research',this)"><span class="nav-icon">🔬</span><span data-i18n="projResearch">Project Research</span><span class="nav-badge green">4</span></div>
+  <div class="nav-item" onclick="showPanel('portfolio',this)"><span class="nav-icon">◈</span><span data-i18n="portfolio">Portfolio</span><span class="nav-badge green">3</span></div>
+  <div class="nav-item" onclick="showPanel('docs',this)"><span class="nav-icon">📄</span><span data-i18n="documents">Documents</span><span class="nav-badge amber">1</span></div>
+  <div class="nav-item" onclick="showPanel('monitor',this)"><span class="nav-icon">📡</span><span data-i18n="monitoring">Monitoring</span></div>
+  <div class="sidebar-label" data-i18n="navSystem">System</div>
+  <div class="nav-item" onclick="clearChat()"><span class="nav-icon">↺</span><span data-i18n="resetSession">Reset Session</span></div>
 </nav>
 
 <main class="main">
@@ -330,107 +305,105 @@ tr:hover td{background:var(--green-faint);}
       <div class="messages" id="messages"></div>
       <div class="input-bar">
         <div class="mode-pills">
-          <div class="mode-pill active" onclick="setChatMode(this,'full-deploy')">⚡ Full Deploy</div>
-          <div class="mode-pill" onclick="setChatMode(this,'research-only')">🔬 Research</div>
-          <div class="mode-pill" onclick="setChatMode(this,'portfolio-only')">◈ Portfolio</div>
-          <div class="mode-pill" onclick="setChatMode(this,'docs-only')">📄 Docs</div>
-          <div class="mode-pill" onclick="setChatMode(this,'monitoring-only')">📡 Monitor</div>
-          <div class="mode-pill" onclick="setChatMode(this,'monthly-run')">📊 Monthly Run</div>
-          <div class="mode-pill starter-pill" onclick="showPanel('starter',document.getElementById('starter-nav'))">🌱 Starter</div>
+          <div class="mode-pill active" onclick="setChatMode(this,'full-deploy')" data-i18n="pillFullDeploy">⚡ Full Deploy</div>
+          <div class="mode-pill" onclick="setChatMode(this,'research-only')" data-i18n="pillResearch">🔬 Research</div>
+          <div class="mode-pill" onclick="setChatMode(this,'portfolio-only')" data-i18n="pillPortfolio">◈ Portfolio</div>
+          <div class="mode-pill" onclick="setChatMode(this,'docs-only')" data-i18n="pillDocs">📄 Docs</div>
+          <div class="mode-pill" onclick="setChatMode(this,'monitoring-only')" data-i18n="pillMonitor">📡 Monitor</div>
+          <div class="mode-pill" onclick="setChatMode(this,'monthly-run')" data-i18n="pillMonthly">📊 Monthly Run</div>
+          <div class="mode-pill starter-pill" onclick="showPanel('starter',document.getElementById('starter-nav'))" data-i18n="pillStarter">🌱 Starter</div>
         </div>
         <div class="input-row">
-          <textarea id="input" rows="1" placeholder="Describe your client, project, or task..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <textarea id="input" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" data-i18n-placeholder="chatPlaceholder"></textarea>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
         </div>
       </div>
     </div>
     <div class="chat-context">
       <div class="context-section">
-        <div class="context-title">Session Context</div>
-        <div class="context-item"><span class="context-key">Client</span><span class="context-val green" id="ctx-client">—</span></div>
-        <div class="context-item"><span class="context-key">Mode</span><span class="context-val amber" id="ctx-mode">full-deploy</span></div>
-        <div class="context-item"><span class="context-key">Volume</span><span class="context-val" id="ctx-volume">—</span></div>
-        <div class="context-item"><span class="context-key">Budget</span><span class="context-val" id="ctx-budget">—</span></div>
-        <div class="context-item"><span class="context-key">Framework</span><span class="context-val" id="ctx-framework">—</span></div>
+        <div class="context-title" data-i18n="sessionCtx">SESSION CONTEXT</div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxClient">Client</span><span class="context-val green" id="ctx-client">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxMode">Mode</span><span class="context-val amber" id="ctx-mode">full-deploy</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxVolume">Volume</span><span class="context-val" id="ctx-volume">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxBudget">Budget</span><span class="context-val" id="ctx-budget">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxFramework">Framework</span><span class="context-val" id="ctx-framework">—</span></div>
       </div>
       <div class="phase-pipeline">
-        <div class="pipeline-title">Phase Pipeline</div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-research"></div><div class="pipe-label" id="lbl-research">Research</div></div>
+        <div class="pipeline-title" data-i18n="pipelineTitle">PHASE PIPELINE</div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-research"></div><div class="pipe-label" id="lbl-research" data-i18n="phResearch">Research</div></div>
         <div class="pipe-line"></div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-portfolio"></div><div class="pipe-label" id="lbl-portfolio">Portfolio</div></div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-portfolio"></div><div class="pipe-label" id="lbl-portfolio" data-i18n="phPortfolio">Portfolio</div></div>
         <div class="pipe-line"></div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-docs"></div><div class="pipe-label" id="lbl-docs">Docs</div></div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-docs"></div><div class="pipe-label" id="lbl-docs" data-i18n="phDocs">Docs</div></div>
         <div class="pipe-line"></div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-monitor"></div><div class="pipe-label" id="lbl-monitor">Monitoring</div></div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="dot-monitor"></div><div class="pipe-label" id="lbl-monitor" data-i18n="phMonitor">Monitoring</div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- STARTER PACKAGE PANEL -->
+<!-- STARTER PANEL -->
 <div class="panel" id="panel-starter">
   <div class="chat-layout">
     <div class="chat-main" style="overflow:hidden;display:flex;flex-direction:column;">
       <div class="starter-steps">
-        <div class="starter-step s-active" id="sstep-1"><div class="step-num" id="snum-1">1</div>Data Collection</div>
-        <div class="starter-step" id="sstep-2"><div class="step-num" id="snum-2">2</div>Footprint Estimate</div>
-        <div class="starter-step" id="sstep-3"><div class="step-num" id="snum-3">3</div>Offset &amp; Report</div>
+        <div class="starter-step s-active" id="sstep-1"><div class="step-num">1</div><span data-i18n="step1Label">Data Collection</span></div>
+        <div class="starter-step" id="sstep-2"><div class="step-num">2</div><span data-i18n="step2Label">Footprint Estimate</span></div>
+        <div class="starter-step" id="sstep-3"><div class="step-num">3</div><span data-i18n="step3Label">Offset &amp; Report</span></div>
       </div>
       <div class="starter-content">
-        <div class="starter-form-area" id="starter-form-area">
+        <div class="starter-form-area">
 
           <!-- STEP 1 -->
           <div id="s-step1">
             <div class="form-section">
-              <div class="form-section-title">Client Information</div>
-              <div class="form-section-sub">VSME STARTER PACKAGE · STEP 1 OF 3 · No GHG inventory required</div>
+              <div class="form-section-title" data-i18n="clientInfo">Client Information</div>
+              <div class="form-section-sub" data-i18n="step1Sub">VSME STARTER PACKAGE · STEP 1 OF 3 · No GHG inventory required</div>
               <div class="field-group">
-                <label class="field-label">Client / Company Name <span>*</span></label>
-                <input type="text" class="field-input" id="f-name" placeholder="e.g. Sunrise Bakery Ltd" oninput="livePreview()">
+                <label class="field-label"><span data-i18n="clientName">Client / Company Name</span> <span class="req">*</span></label>
+                <input type="text" class="field-input" id="f-name" oninput="livePreview()" data-i18n-placeholder="clientNamePh">
               </div>
               <div class="field-row">
                 <div class="field-group">
-                  <label class="field-label">Industry Sector <span>*</span></label>
+                  <label class="field-label"><span data-i18n="industrySector">Industry Sector</span> <span class="req">*</span></label>
                   <div class="select-wrap">
                     <select class="field-select" id="f-industry" onchange="livePreview()">
                       <option value="">— Select industry —</option>
-                      <option>Professional Services</option>
-                      <option>Retail</option>
-                      <option>Manufacturing</option>
-                      <option>Logistics</option>
-                      <option>Restaurant/Food</option>
-                      <option>Construction</option>
-                      <option>Healthcare</option>
-                      <option>Other</option>
+                      <option value="Professional Services">Professional Services</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Manufacturing">Manufacturing</option>
+                      <option value="Logistics">Logistics</option>
+                      <option value="Restaurant/Food">Restaurant/Food</option>
+                      <option value="Construction">Construction</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Annual Revenue (USD) <span>*</span></label>
-                  <input type="number" class="field-input" id="f-revenue" placeholder="e.g. 2500000" oninput="livePreview()">
-                  <div class="field-hint">Enter full amount · e.g. 2500000 for $2.5M</div>
+                  <label class="field-label"><span data-i18n="annualRevenue">Annual Revenue (USD)</span> <span class="req">*</span></label>
+                  <input type="number" class="field-input" id="f-revenue" oninput="livePreview()" data-i18n-placeholder="revenuePh">
+                  <div class="field-hint" data-i18n="revenueHint">Enter full amount · e.g. 2500000 for $2.5M</div>
                 </div>
               </div>
               <div class="field-row">
                 <div class="field-group">
-                  <label class="field-label">Number of Employees <span>*</span></label>
-                  <input type="number" class="field-input" id="f-employees" placeholder="e.g. 24" oninput="livePreview()">
+                  <label class="field-label"><span data-i18n="numEmployees">Number of Employees</span> <span class="req">*</span></label>
+                  <input type="number" class="field-input" id="f-employees" oninput="livePreview()" data-i18n-placeholder="employeesPh">
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Monthly Electricity Bill (USD) <span style="color:var(--text-muted)">optional</span></label>
-                  <input type="number" class="field-input" id="f-electricity" placeholder="e.g. 1200" oninput="livePreview()">
-                  <div class="field-hint">Improves Scope 2 accuracy · uses $0.12/kWh grid rate</div>
+                  <label class="field-label"><span data-i18n="elecBill">Monthly Electricity Bill (USD)</span> <span class="opt" data-i18n="optional">optional</span></label>
+                  <input type="number" class="field-input" id="f-electricity" oninput="livePreview()" data-i18n-placeholder="elecPh">
+                  <div class="field-hint" data-i18n="elecHint">Improves Scope 2 accuracy · uses $0.12/kWh grid rate</div>
                 </div>
               </div>
               <div class="field-row">
                 <div class="field-group">
-                  <label class="field-label">Reporting Year</label>
-                  <div class="select-wrap">
-                    <select class="field-select" id="f-year"><option>2024</option><option>2023</option><option>2025</option></select>
-                  </div>
+                  <label class="field-label" data-i18n="reportingYear">Reporting Year</label>
+                  <div class="select-wrap"><select class="field-select" id="f-year"><option>2024</option><option>2023</option><option>2025</option></select></div>
                 </div>
                 <div class="field-group">
-                  <label class="field-label">ESG Framework</label>
+                  <label class="field-label" data-i18n="esgFramework">ESG Framework</label>
                   <div class="select-wrap">
                     <select class="field-select" id="f-framework">
                       <option value="VSME">VSME (SME Standard)</option>
@@ -443,82 +416,81 @@ tr:hover td{background:var(--green-faint);}
               </div>
             </div>
             <div style="display:flex;gap:10px;align-items:center;">
-              <button class="starter-btn btn-teal" onclick="goToStep2()">Calculate Footprint →</button>
-              <span style="font-family:var(--mono);font-size:10px;color:var(--text-muted);">Uses industry-average emission factors</span>
+              <button class="starter-btn btn-teal" onclick="goToStep2()" data-i18n="calcFootprint">Calculate Footprint →</button>
+              <span style="font-family:var(--mono);font-size:10px;color:var(--text-muted);" data-i18n="usesAvg">Uses industry-average emission factors</span>
             </div>
           </div>
 
           <!-- STEP 2 -->
           <div id="s-step2" style="display:none;">
             <div class="form-section">
-              <div class="form-section-title">Estimated Carbon Footprint</div>
+              <div class="form-section-title" data-i18n="estFootprint">Estimated Carbon Footprint</div>
               <div class="form-section-sub" id="s2-sub">VSME STARTER PACKAGE · STEP 2 OF 3</div>
             </div>
             <div id="footprint-results"></div>
             <div class="form-section" style="margin-top:24px;">
-              <div class="form-section-title">Methodology Note</div>
-              <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:1.7;background:var(--surface2);padding:12px;border-radius:6px;border:1px solid var(--border);">
+              <div class="form-section-title" data-i18n="methNote">Methodology Note</div>
+              <div class="meth-box" id="meth-box">
                 Scope 1 · Direct combustion &amp; fleet: estimated at 15% of total industry benchmark.<br>
                 Scope 2 · Purchased electricity: from monthly electricity bill or industry average (25% of total).<br>
                 Scope 3 · Supply chain, travel, waste: estimated as remainder via revenue-based factor.<br>
-                <span style="color:var(--amber);">⚠ Estimates only. Replace with metered data for formal verification.</span>
+                <span style="color:var(--amber);" data-i18n="methWarn">⚠ Estimates only. Replace with metered data for formal verification.</span>
               </div>
             </div>
             <div style="display:flex;gap:10px;">
-              <button class="starter-btn btn-outline" onclick="goToStep1()">← Back</button>
-              <button class="starter-btn btn-teal" onclick="goToStep3()">Select Offsets →</button>
+              <button class="starter-btn btn-outline" onclick="goToStep1()" data-i18n="back">← Back</button>
+              <button class="starter-btn btn-teal" onclick="goToStep3()" data-i18n="selectOffsets">Select Offsets →</button>
             </div>
           </div>
 
           <!-- STEP 3 -->
           <div id="s-step3" style="display:none;">
             <div class="form-section">
-              <div class="form-section-title">Select Carbon Credits</div>
-              <div class="form-section-sub">LOW-COST VERIFIED PROJECTS · STEP 3 OF 3</div>
+              <div class="form-section-title" data-i18n="selectCredits">Select Carbon Credits</div>
+              <div class="form-section-sub" data-i18n="step3Sub">LOW-COST VERIFIED PROJECTS · STEP 3 OF 3</div>
             </div>
             <div class="credit-cards">
               <div class="credit-card selected" id="cc-wind" onclick="selectCredit('wind')">
                 <div class="credit-check">✓</div>
                 <div class="credit-flag">🇮🇳</div>
-                <div class="credit-name">Wind Power India</div>
+                <div class="credit-name" id="wind-name">Wind Power India</div>
                 <div class="credit-price">$3.50 <span>/ tCO₂e</span></div>
                 <div class="credit-type">RENEWABLE ENERGY · GOLD STANDARD</div>
               </div>
               <div class="credit-card" id="cc-landfill" onclick="selectCredit('landfill')">
                 <div class="credit-check">✓</div>
                 <div class="credit-flag">🇺🇸</div>
-                <div class="credit-name">Landfill Gas USA</div>
+                <div class="credit-name" id="landfill-name">Landfill Gas USA</div>
                 <div class="credit-price">$4.20 <span>/ tCO₂e</span></div>
                 <div class="credit-type">METHANE CAPTURE · VERRA VCS</div>
               </div>
             </div>
             <div class="result-card green-card" style="margin-bottom:16px;">
-              <div class="result-label">Total Offset Cost</div>
+              <div class="result-label" id="offset-cost-label" data-i18n="totalOffsetCost">Total Offset Cost</div>
               <div class="result-value green" id="offset-total-val">—</div>
-              <div class="result-sub" id="offset-total-sub">Select a project to calculate</div>
+              <div class="result-sub" id="offset-total-sub" data-i18n="selectProject">Select a project to calculate</div>
             </div>
-            <div id="retire-area" style="margin-bottom:16px;">
-              <button class="starter-btn btn-green" onclick="simulateRetirement()" id="retire-btn">⬡ Simulate Credit Retirement</button>
-              <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:6px;">Connects to Regen Network MCP in production</div>
+            <div style="margin-bottom:16px;">
+              <button class="starter-btn btn-green" onclick="simulateRetirement()" id="retire-btn" data-i18n="simulateBtn">⬡ Simulate Credit Retirement</button>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:6px;" data-i18n="regenNote">Connects to Regen Network MCP in production</div>
             </div>
             <div id="tx-success-area"></div>
             <hr class="divider">
             <div class="form-section">
-              <div class="form-section-title">VSME ESG Report</div>
-              <div class="form-section-sub">ONE-PAGE PDF WITH RETIREMENT CERTIFICATE</div>
+              <div class="form-section-title" data-i18n="vsmeReport">VSME ESG Report</div>
+              <div class="form-section-sub" data-i18n="reportSub">ONE-PAGE PDF WITH RETIREMENT CERTIFICATE</div>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="starter-btn btn-outline" onclick="goToStep2()">← Back</button>
-              <button class="starter-btn btn-amber" onclick="generatePDF()" id="pdf-btn">⬇ Generate PDF Report</button>
+              <button class="starter-btn btn-outline" onclick="goToStep2()" data-i18n="back">← Back</button>
+              <button class="starter-btn btn-amber" onclick="generatePDF()" id="pdf-btn" data-i18n="generatePDF">⬇ Generate PDF Report</button>
             </div>
           </div>
-
-        </div><!-- /starter-form-area -->
+        </div>
 
         <div class="starter-preview">
-          <div class="preview-title">Live Preview</div>
+          <div class="preview-title" data-i18n="livePreview">Live Preview</div>
           <div id="preview-content">
-            <div class="preview-empty"><span style="font-size:24px;">🌱</span>Fill in the form to preview your carbon footprint estimate in real time.</div>
+            <div class="preview-empty"><span style="font-size:24px;">🌱</span><span data-i18n="previewEmpty">Fill in the form to preview your carbon footprint estimate in real time.</span></div>
           </div>
         </div>
       </div>
@@ -526,21 +498,21 @@ tr:hover td{background:var(--green-faint);}
 
     <div class="chat-context">
       <div class="context-section">
-        <div class="context-title">Starter Context</div>
-        <div class="context-item"><span class="context-key">Client</span><span class="context-val teal" id="sctx-client">—</span></div>
-        <div class="context-item"><span class="context-key">Industry</span><span class="context-val" id="sctx-industry">—</span></div>
-        <div class="context-item"><span class="context-key">Revenue</span><span class="context-val" id="sctx-revenue">—</span></div>
-        <div class="context-item"><span class="context-key">Employees</span><span class="context-val" id="sctx-employees">—</span></div>
-        <div class="context-item"><span class="context-key">Est. tCO₂e</span><span class="context-val teal" id="sctx-tonnes">—</span></div>
-        <div class="context-item"><span class="context-key">Offset Cost</span><span class="context-val green" id="sctx-cost">—</span></div>
+        <div class="context-title" data-i18n="starterCtx">STARTER CONTEXT</div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxClient">Client</span><span class="context-val teal" id="sctx-client">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxIndustry">Industry</span><span class="context-val" id="sctx-industry">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxRevenue">Revenue</span><span class="context-val" id="sctx-revenue">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxEmployees">Employees</span><span class="context-val" id="sctx-employees">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxTonnes">Est. tCO₂e</span><span class="context-val teal" id="sctx-tonnes">—</span></div>
+        <div class="context-item"><span class="context-key" data-i18n="ctxOffsetCost">Offset Cost</span><span class="context-val green" id="sctx-cost">—</span></div>
       </div>
       <div class="phase-pipeline">
-        <div class="pipeline-title">Starter Pipeline</div>
-        <div class="pipeline-step"><div class="pipe-dot active" id="sdot-collect"></div><div class="pipe-label active" id="slbl-collect">Data Collection</div></div>
+        <div class="pipeline-title" data-i18n="starterPipelineTitle">STARTER PIPELINE</div>
+        <div class="pipeline-step"><div class="pipe-dot active" id="sdot-collect"></div><div class="pipe-label active" id="slbl-collect" data-i18n="step1Label">Data Collection</div></div>
         <div class="pipe-line"></div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="sdot-estimate"></div><div class="pipe-label" id="slbl-estimate">Footprint Estimate</div></div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="sdot-estimate"></div><div class="pipe-label" id="slbl-estimate" data-i18n="step2Label">Footprint Estimate</div></div>
         <div class="pipe-line"></div>
-        <div class="pipeline-step"><div class="pipe-dot pending" id="sdot-offset"></div><div class="pipe-label" id="slbl-offset">Offset &amp; Report</div></div>
+        <div class="pipeline-step"><div class="pipe-dot pending" id="sdot-offset"></div><div class="pipe-label" id="slbl-offset" data-i18n="step3Label">Offset &amp; Report</div></div>
       </div>
     </div>
   </div>
@@ -583,9 +555,9 @@ tr:hover td{background:var(--green-faint);}
     <div class="table-wrap"><div class="table-title">Selected Portfolio — 3 Projects</div>
       <table><thead><tr><th>#</th><th>Project</th><th>Allocation</th><th>Tonnes</th><th>Price</th><th>Cost</th><th>SDGs</th><th>Profile</th></tr></thead>
       <tbody>
-        <tr><td style="color:var(--green);font-weight:700">01</td><td><strong>Patagonia Blue Carbon</strong><br><span style="font-size:10px;color:var(--text-muted)">VCS-2201 · Blue Carbon · Chile</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:40%;height:100%;background:var(--green);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">40%</span></div></td><td>2,000</td><td>$28.00</td><td><strong>$56,000</strong></td><td><span style="font-size:11px">13 14 15</span></td><td><span class="badge badge-blue">PREMIUM</span></td></tr>
-        <tr><td style="color:var(--green);font-weight:700">02</td><td><strong>Kenya Cookstoves</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-12043 · Cookstoves · Kenya</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:35%;height:100%;background:var(--green-dim);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">35%</span></div></td><td>1,750</td><td>$11.20</td><td><strong>$19,600</strong></td><td><span style="font-size:11px">3 5 7 13</span></td><td><span class="badge badge-green">CORE</span></td></tr>
-        <tr><td style="color:var(--green);font-weight:700">03</td><td><strong>Maharashtra Solar</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-8834 · Renewable · India</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:25%;height:100%;background:var(--text-muted);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">25%</span></div></td><td>1,250</td><td>$3.80</td><td><strong>$4,750</strong></td><td><span style="font-size:11px">7 8 13</span></td><td><span class="badge badge-amber">VOLUME</span></td></tr>
+        <tr><td style="color:var(--green);font-weight:700">01</td><td><strong>Patagonia Blue Carbon</strong><br><span style="font-size:10px;color:var(--text-muted)">VCS-2201 · Blue Carbon · Chile</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:40%;height:100%;background:var(--green);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">40%</span></div></td><td>2,000</td><td>$28.00</td><td><strong>$56,000</strong></td><td>13 14 15</td><td><span class="badge badge-blue">PREMIUM</span></td></tr>
+        <tr><td style="color:var(--green);font-weight:700">02</td><td><strong>Kenya Cookstoves</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-12043 · Cookstoves · Kenya</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:35%;height:100%;background:var(--green-dim);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">35%</span></div></td><td>1,750</td><td>$11.20</td><td><strong>$19,600</strong></td><td>3 5 7 13</td><td><span class="badge badge-green">CORE</span></td></tr>
+        <tr><td style="color:var(--green);font-weight:700">03</td><td><strong>Maharashtra Solar</strong><br><span style="font-size:10px;color:var(--text-muted)">GS-8834 · Renewable · India</span></td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px"><div style="width:25%;height:100%;background:var(--text-muted);border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px">25%</span></div></td><td>1,250</td><td>$3.80</td><td><strong>$4,750</strong></td><td>7 8 13</td><td><span class="badge badge-amber">VOLUME</span></td></tr>
       </tbody></table>
     </div>
   </div>
@@ -626,173 +598,503 @@ tr:hover td{background:var(--green-faint);}
     </div>
     <div class="alert-item critical"><div class="alert-dot critical"></div><div><div class="alert-title">🔴 Retirement Deadline — 22 Days</div><div class="alert-desc">Kenya Cookstoves (GS-12043) — 1,750 tCO₂e must be retired by Feb 5, 2025.</div><button class="action-btn">→ Open Registry Portal</button></div></div>
     <div class="alert-item warning"><div class="alert-dot warning"></div><div><div class="alert-title">🟡 Verification Due — 48 Days</div><div class="alert-desc">Patagonia Blue Carbon (VCS-2201) — Third-party verification window opens March 1.</div><button class="action-btn">→ Contact Verifier</button></div></div>
-    <div class="alert-item warning"><div class="alert-dot warning"></div><div><div class="alert-title">🟡 Annual ESG Report Deadline — 38 Days</div><div class="alert-desc">CDP Climate submission closes Feb 28. Awaiting final sign-off from ESG Director.</div><button class="action-btn">→ Review Documents</button></div></div>
-    <div class="alert-item info"><div class="alert-dot info"></div><div><div class="alert-title">✅ Verification Complete — Maharashtra Solar</div><div class="alert-desc">GS-8834 re-verified by Bureau Veritas. 1,250 tCO₂e confirmed. Price up 8% vs. purchase.</div></div></div>
+    <div class="alert-item warning"><div class="alert-dot warning"></div><div><div class="alert-title">🟡 Annual ESG Report Deadline — 38 Days</div><div class="alert-desc">CDP Climate submission closes Feb 28. Awaiting sign-off from ESG Director.</div><button class="action-btn">→ Review Documents</button></div></div>
+    <div class="alert-item info"><div class="alert-dot info"></div><div><div class="alert-title">✅ Verification Complete — Maharashtra Solar</div><div class="alert-desc">GS-8834 re-verified by Bureau Veritas. 1,250 tCO₂e confirmed. Price up 8%.</div></div></div>
   </div>
 </div>
 
 </main>
 </div>
 
-<!-- PDF TEMPLATE (hidden) -->
+<!-- PDF TEMPLATE -->
 <div id="pdf-report">
   <div class="r-header">
     <div><div class="r-logo">ESG<span>Carbon</span> Agent</div><div style="font-size:12px;color:#5A7A6A;margin-top:4px;">Automated Carbon Management Platform</div></div>
-    <div class="r-meta"><div id="r-date"></div><div id="r-fw-label"></div><div>Starter Package Report</div></div>
+    <div class="r-meta"><div id="r-date"></div><div id="r-fw-label"></div><div id="r-starter-label">Starter Package Report</div></div>
   </div>
-  <div class="r-badge">VSME Aligned · Starter Package · SMB Edition</div>
+  <div class="r-badge" id="r-badge">VSME Aligned · Starter Package · SMB Edition</div>
   <h1 id="r-title">ESG Carbon Footprint &amp; Offset Report</h1>
   <div style="color:#5A7A6A;font-size:12px;margin-bottom:20px;" id="r-client-line"></div>
-  <h2>1. Company Profile</h2>
+  <h2 id="r-h2-profile">1. Company Profile</h2>
   <table><tbody id="r-profile-table"></tbody></table>
-  <h2>2. Estimated GHG Emissions</h2>
+  <h2 id="r-h2-ghg">2. Estimated GHG Emissions</h2>
   <div class="r-scope-grid" id="r-scope-grid"></div>
-  <table><thead><tr><th>Scope</th><th>Emission Source</th><th>Estimation Method</th><th>tCO₂e</th></tr></thead><tbody id="r-emissions-table"></tbody></table>
-  <div style="font-size:11px;color:#5A7A6A;margin-top:8px;font-style:italic;">Figures are estimates based on industry-average emission factors per the GHG Protocol Corporate Standard. Suitable for VSME preliminary reporting. Replace with metered activity data for formal third-party verification.</div>
-  <h2>3. Carbon Offset Program</h2>
-  <table><thead><tr><th>Project</th><th>Registry</th><th>Type</th><th>Vintage</th><th>Tonnes</th><th>Price/t</th><th>Total Cost</th></tr></thead><tbody id="r-offset-table"></tbody></table>
+  <table><thead><tr><th id="r-th-scope">Scope</th><th id="r-th-source">Emission Source</th><th id="r-th-method">Estimation Method</th><th id="r-th-tco2">tCO₂e</th></tr></thead><tbody id="r-emissions-table"></tbody></table>
+  <div style="font-size:11px;color:#5A7A6A;margin-top:8px;font-style:italic;" id="r-ghg-note">Figures are estimates based on industry-average emission factors per the GHG Protocol Corporate Standard.</div>
+  <h2 id="r-h2-offset">3. Carbon Offset Program</h2>
+  <table><thead><tr><th id="r-th-proj">Project</th><th id="r-th-reg">Registry</th><th id="r-th-type">Type</th><th id="r-th-vint">Vintage</th><th id="r-th-tonnes">Tonnes</th><th id="r-th-price">Price/t</th><th id="r-th-cost">Total Cost</th></tr></thead><tbody id="r-offset-table"></tbody></table>
   <div class="r-cert">
-    <div class="r-cert-title">🏆 Carbon Credit Retirement Certificate</div>
+    <div class="r-cert-title" id="r-cert-title">🏆 Carbon Credit Retirement Certificate</div>
     <div id="r-cert-rows"></div>
-    <div style="font-size:11px;color:#5A7A6A;margin-top:12px;font-style:italic;">These carbon credits have been permanently retired and cannot be resold or transferred. In production, this certificate is linked to the Regen Network / Verra registry transaction record.</div>
+    <div style="font-size:11px;color:#5A7A6A;margin-top:12px;font-style:italic;" id="r-cert-note">These carbon credits have been permanently retired and cannot be resold or transferred.</div>
   </div>
-  <h2>4. Net Emissions Position</h2>
+  <h2 id="r-h2-net">4. Net Emissions Position</h2>
   <table><tbody id="r-net-table"></tbody></table>
-  <div class="r-vsme">📋 <strong>VSME Alignment Statement</strong><br>This report aligns with the VSME (Voluntary SME) standard for small and medium enterprises, providing a simplified but credible assessment of greenhouse gas emissions and offset activities. The methodology follows the GHG Protocol Corporate Standard for Scope 1, 2, and 3 emissions categorisation.</div>
-  <div class="r-footer"><strong>Generated by ESG Carbon Agent</strong> — Automated Carbon Management Platform<br>This report was prepared using industry-average emission factors for demonstration and planning purposes. For formal regulatory disclosure, activity-based data collection and third-party verification are recommended.<br>Report generated: <span id="r-footer-date"></span> · All figures in metric tonnes CO₂ equivalent (tCO₂e)</div>
+  <div class="r-vsme" id="r-vsme-text">📋 This report aligns with the VSME standard for small and medium enterprises.</div>
+  <div class="r-footer" id="r-footer-text"></div>
 </div>
 
 <script>
-// ═══ DATA ═══
+// ══════════════════════════════════════════
+// TRANSLATIONS  —  simple key→string lookup
+// ══════════════════════════════════════════
+const LANG = {
+  en: {
+    // header / status
+    agentOnline:'AGENT ONLINE',
+    // sidebar section labels
+    navAgent:'Agent', navTools:'Tools', navPhases:'Phases', navSystem:'System',
+    // sidebar nav items
+    cmdCenter:'Command Center', starterPkg:'Starter Package',
+    projResearch:'Project Research', portfolio:'Portfolio',
+    documents:'Documents', monitoring:'Monitoring', resetSession:'Reset Session',
+    // mode pills
+    pillFullDeploy:'⚡ Full Deploy', pillResearch:'🔬 Research',
+    pillPortfolio:'◈ Portfolio', pillDocs:'📄 Docs',
+    pillMonitor:'📡 Monitor', pillMonthly:'📊 Monthly Run', pillStarter:'🌱 Starter',
+    // chat input
+    chatPlaceholder:'Describe your client, project, or task...',
+    // context sidebar – chat
+    sessionCtx:'SESSION CONTEXT',
+    ctxClient:'Client', ctxMode:'Mode', ctxVolume:'Volume',
+    ctxBudget:'Budget', ctxFramework:'Framework',
+    pipelineTitle:'PHASE PIPELINE',
+    phResearch:'Research', phPortfolio:'Portfolio', phDocs:'Docs', phMonitor:'Monitoring',
+    // context sidebar – starter
+    starterCtx:'STARTER CONTEXT',
+    ctxIndustry:'Industry', ctxRevenue:'Revenue',
+    ctxEmployees:'Employees', ctxTonnes:'Est. tCO₂e', ctxOffsetCost:'Offset Cost',
+    starterPipelineTitle:'STARTER PIPELINE',
+    // step labels (used in tabs AND pipeline)
+    step1Label:'Data Collection', step2Label:'Footprint Estimate', step3Label:'Offset & Report',
+    // step 1 form
+    clientInfo:'Client Information',
+    step1Sub:'VSME STARTER PACKAGE · STEP 1 OF 3 · No GHG inventory required',
+    clientName:'Client / Company Name', clientNamePh:'e.g. Sunrise Bakery Ltd',
+    industrySector:'Industry Sector',
+    selectIndustry:'— Select industry —',
+    indProfServices:'Professional Services', indRetail:'Retail',
+    indManufacturing:'Manufacturing', indLogistics:'Logistics',
+    indRestaurant:'Restaurant/Food', indConstruction:'Construction',
+    indHealthcare:'Healthcare', indOther:'Other',
+    annualRevenue:'Annual Revenue (USD)', revenuePh:'e.g. 2500000',
+    revenueHint:'Enter full amount · e.g. 2500000 for $2.5M',
+    numEmployees:'Number of Employees', employeesPh:'e.g. 24',
+    elecBill:'Monthly Electricity Bill (USD)', optional:'optional',
+    elecPh:'e.g. 1200', elecHint:'Improves Scope 2 accuracy · uses $0.12/kWh grid rate',
+    reportingYear:'Reporting Year', esgFramework:'ESG Framework',
+    calcFootprint:'Calculate Footprint →',
+    usesAvg:'Uses industry-average emission factors',
+    // step 2
+    estFootprint:'Estimated Carbon Footprint',
+    methNote:'Methodology Note',
+    methBoxHTML:'Scope 1 · Direct combustion &amp; fleet: estimated at 15% of total industry benchmark.<br>Scope 2 · Purchased electricity: from monthly electricity bill or industry average (25% of total).<br>Scope 3 · Supply chain, travel, waste: estimated as remainder via revenue-based factor.<br><span style="color:var(--amber);">⚠ Estimates only. Replace with metered data for formal verification.</span>',
+    methWarn:'⚠ Estimates only. Replace with metered data for formal verification.',
+    back:'← Back', selectOffsets:'Select Offsets →',
+    // step 3
+    selectCredits:'Select Carbon Credits',
+    step3Sub:'LOW-COST VERIFIED PROJECTS · STEP 3 OF 3',
+    windCreditName:'Wind Power India', landfillCreditName:'Landfill Gas USA',
+    totalOffsetCost:'Total Offset Cost',
+    selectProject:'Select a project to calculate',
+    simulateBtn:'⬡ Simulate Credit Retirement',
+    regenNote:'Connects to Regen Network MCP in production',
+    vsmeReport:'VSME ESG Report',
+    reportSub:'ONE-PAGE PDF WITH RETIREMENT CERTIFICATE',
+    generatePDF:'⬇ Generate PDF Report',
+    // preview
+    livePreview:'Live Preview',
+    previewEmpty:'Fill in the form to preview your carbon footprint estimate in real time.',
+    // retirement success message (built dynamically)
+    retiredTitle:'✅ Retirement Simulated Successfully',
+    txId:'Transaction ID', txProject:'Project', txSerial:'Serial Numbers',
+    txTonnes:'Tonnes Retired', txCost:'Total Cost',
+    txDate:'Retirement Date', txBene:'Beneficiary',
+    txNote:'SIMULATED · Will connect to Regen Network MCP / Verra registry in production',
+    retiredBtnText:'✓ Retired',
+    // footprint results (built dynamically)
+    totalAnnual:'Total Estimated Annual Footprint',
+    scope123:'Scope 1+2+3',
+    industryAvg:'Industry-average methodology',
+    scope1Label:'Scope 1 — Direct', scope2Label:'Scope 2 — Electricity', scope3Label:'Scope 3 — Supply Chain',
+    emFactor:'Emission Factor', perRevM:'per $1M revenue',
+    perEmployee:'Per Employee', perPerson:'tCO₂e per person',
+    revIntensity:'Revenue Intensity', perRevM2:'per $1M revenue',
+    offsetCostAt:'Offset Cost @ ',
+    // welcome chat message
+    welcomeTitle:'ESG Carbon Agent online.',
+    welcomeBody:'Full lifecycle carbon credit management — research, portfolio, documentation, monitoring. For SMBs with no GHG inventory, use <code>🌱 Starter Package</code> in the sidebar.',
+    welcomeEx1:'Research VCS-1847 Borneo REDD+ — 2,000 tonnes, $15/t ceiling',
+    welcomeEx2:'Build a balanced portfolio for Acme Corp — $80k, GHG Protocol, 5,000 tCO₂e',
+    welcomeEx3:'Generate retirement certificate for VCS-2201, 2,000 tonnes',
+    // PDF strings
+    pdfBadge:'VSME Aligned · Starter Package · SMB Edition',
+    pdfTitle:'ESG Carbon Footprint & Offset Report',
+    pdfFwSuffix:' Framework', pdfStarterReport:'Starter Package Report',
+    pdfH1Profile:'1. Company Profile', pdfH1GHG:'2. Estimated GHG Emissions',
+    pdfH1Offset:'3. Carbon Offset Program', pdfH1Net:'4. Net Emissions Position',
+    pdfCompanyName:'Company Name', pdfIndustry:'Industry Sector',
+    pdfRevenue:'Annual Revenue (USD)', pdfEmployees:'Number of Employees',
+    pdfYear:'Reporting Year', pdfFramework:'Reporting Framework', pdfReportDate:'Report Date',
+    pdfThScope:'Scope', pdfThSource:'Emission Source', pdfThMethod:'Estimation Method', pdfThTCO2:'tCO₂e',
+    pdfS1Source:'Stationary combustion, fleet, process',
+    pdfS2Source:'Purchased electricity & heat',
+    pdfS3Source:'Supply chain, business travel, waste',
+    pdfS1Method:'Revenue-based industry factor (15%)',
+    pdfS2MethodElec:'Electricity spend ÷ $0.12/kWh × 0.3 kg CO₂/kWh',
+    pdfS2MethodAvg:'Industry benchmark (25% of total)',
+    pdfS3Method:'Revenue-based residual',
+    pdfTotalGross:'Total Gross Emissions',
+    pdfThProj:'Project', pdfThReg:'Registry', pdfThType:'Type',
+    pdfThVint:'Vintage', pdfThTonnes:'Tonnes', pdfThPrice:'Price/t', pdfThCost:'Total Cost',
+    pdfCertTitle:'🏆 Carbon Credit Retirement Certificate',
+    pdfCertBene:'Beneficiary', pdfCertProject:'Project', pdfCertRegistry:'Registry',
+    pdfCertVolume:'Volume Retired', pdfCertVintage:'Vintage Year',
+    pdfCertSerial:'Serial Numbers', pdfCertTxId:'Transaction ID',
+    pdfCertDate:'Retirement Date', pdfCertPurpose:'Purpose',
+    pdfCertPurposeVal:'Voluntary offsetting of Scope 1, 2 & 3 emissions, FY',
+    pdfCertNote:'These carbon credits have been permanently retired and cannot be resold or transferred. In production, this certificate is linked to the Regen Network / Verra registry transaction record.',
+    pdfGross:'Gross Emissions', pdfLessOffsets:'Less: Verified Offsets Retired',
+    pdfNetEmissions:'Net Emissions', pdfCarbonNeutral:'0.0 tCO₂e — Carbon Neutral',
+    pdfTotalInvest:'Total Offset Investment',
+    pdfGhgNote:'Figures are estimates based on industry-average emission factors per the GHG Protocol Corporate Standard. Suitable for VSME preliminary reporting. Replace with metered activity data for formal third-party verification.',
+    pdfVsme:'📋 VSME Alignment Statement\nThis report aligns with the VSME (Voluntary SME) standard for small and medium enterprises, providing a simplified but credible assessment of greenhouse gas emissions and offset activities. The methodology follows the GHG Protocol Corporate Standard for Scope 1, 2, and 3 emissions categorisation.',
+    pdfFooter:'Generated by ESG Carbon Agent — Automated Carbon Management Platform\nThis report was prepared using industry-average emission factors for demonstration and planning purposes. For formal regulatory disclosure, activity-based data collection and third-party verification are recommended.\nReport generated: ',
+    pdfFooterSuffix:' · All figures in metric tonnes CO₂ equivalent (tCO₂e)',
+    pdfScope1Box:'Scope 1 · tCO₂e\nDirect Emissions',
+    pdfScope2Box:'Scope 2 · tCO₂e\nElectricity',
+    pdfScope3Box:'Scope 3 · tCO₂e\nValue Chain',
+  },
+  ja: {
+    agentOnline:'エージェント稼働中',
+    navAgent:'エージェント', navTools:'ツール', navPhases:'フェーズ', navSystem:'システム',
+    cmdCenter:'コマンドセンター', starterPkg:'スターターパッケージ',
+    projResearch:'プロジェクト調査', portfolio:'ポートフォリオ',
+    documents:'書類', monitoring:'モニタリング', resetSession:'セッションリセット',
+    pillFullDeploy:'⚡ フル展開', pillResearch:'🔬 調査',
+    pillPortfolio:'◈ ポートフォリオ', pillDocs:'📄 書類',
+    pillMonitor:'📡 監視', pillMonthly:'📊 月次レポート', pillStarter:'🌱 スターター',
+    chatPlaceholder:'クライアント、プロジェクト、またはタスクを入力してください...',
+    sessionCtx:'セッション情報',
+    ctxClient:'クライアント', ctxMode:'モード', ctxVolume:'排出量',
+    ctxBudget:'予算', ctxFramework:'フレームワーク',
+    pipelineTitle:'フェーズ',
+    phResearch:'調査', phPortfolio:'ポートフォリオ', phDocs:'書類', phMonitor:'モニタリング',
+    starterCtx:'スターター情報',
+    ctxIndustry:'業種', ctxRevenue:'売上高',
+    ctxEmployees:'従業員数', ctxTonnes:'推定 tCO₂e', ctxOffsetCost:'オフセット費用',
+    starterPipelineTitle:'ステップ',
+    step1Label:'データ収集', step2Label:'フットプリント算定', step3Label:'オフセット・レポート',
+    clientInfo:'クライアント情報',
+    step1Sub:'VSMEスターターパッケージ · ステップ 1/3 · GHGインベントリ不要',
+    clientName:'クライアント / 会社名', clientNamePh:'例：サンライズベーカリー株式会社',
+    industrySector:'業種',
+    selectIndustry:'— 業種を選択 —',
+    indProfServices:'専門サービス', indRetail:'小売',
+    indManufacturing:'製造業', indLogistics:'物流',
+    indRestaurant:'飲食・フード', indConstruction:'建設',
+    indHealthcare:'医療', indOther:'その他',
+    annualRevenue:'年間売上高（USD）', revenuePh:'例：2500000',
+    revenueHint:'金額をそのまま入力 · 例：250万ドルは 2500000',
+    numEmployees:'従業員数', employeesPh:'例：24',
+    elecBill:'月間電気代（USD）', optional:'任意',
+    elecPh:'例：1200', elecHint:'スコープ2の精度向上 · $0.12/kWh 電力単価を使用',
+    reportingYear:'報告年度', esgFramework:'ESGフレームワーク',
+    calcFootprint:'フットプリントを算定 →',
+    usesAvg:'業種平均排出原単位を使用',
+    estFootprint:'推定カーボンフットプリント',
+    methNote:'算定方法の注記',
+    methBoxHTML:'スコープ1 · 直接燃焼・車両：業種ベンチマークの15%と推定<br>スコープ2 · 購入電力：月間電気代から算定、または業種平均（合計の25%）<br>スコープ3 · サプライチェーン・出張・廃棄物：売上高ベース原単位の残余<br><span style="color:var(--amber);">⚠ 推定値です。正式報告には実測データへの置き換えを推奨します。</span>',
+    methWarn:'⚠ 推定値です。正式報告には実測データへの置き換えを推奨します。',
+    back:'← 戻る', selectOffsets:'オフセットを選択 →',
+    selectCredits:'カーボンクレジットを選択',
+    step3Sub:'低価格認証済みプロジェクト · ステップ 3/3',
+    windCreditName:'インド風力発電', landfillCreditName:'米国埋立地ガス',
+    totalOffsetCost:'オフセット総費用',
+    selectProject:'プロジェクトを選択して計算',
+    simulateBtn:'⬡ クレジット償却をシミュレート',
+    regenNote:'本番環境では Regen Network MCP に接続予定',
+    vsmeReport:'VSME ESGレポート',
+    reportSub:'A4一枚・償却証明書付き PDF',
+    generatePDF:'⬇ PDFレポートを生成',
+    livePreview:'リアルタイムプレビュー',
+    previewEmpty:'フォームに入力するとフットプリント推定値がここに表示されます。',
+    retiredTitle:'✅ 償却シミュレーション完了',
+    txId:'トランザクションID', txProject:'プロジェクト', txSerial:'シリアル番号',
+    txTonnes:'償却量', txCost:'合計費用',
+    txDate:'償却日', txBene:'受益者',
+    txNote:'シミュレーション · 本番では Regen Network MCP / Verra レジストリに接続',
+    retiredBtnText:'✓ 償却済み',
+    totalAnnual:'年間推定カーボンフットプリント',
+    scope123:'スコープ1+2+3',
+    industryAvg:'業種平均算定方法',
+    scope1Label:'スコープ1 — 直接排出', scope2Label:'スコープ2 — 電力', scope3Label:'スコープ3 — サプライチェーン',
+    emFactor:'排出原単位', perRevM:'売上高100万ドル当たり',
+    perEmployee:'従業員一人当たり', perPerson:'tCO₂e / 人 / 年',
+    revIntensity:'売上高原単位', perRevM2:'売上高100万ドル当たり',
+    offsetCostAt:'オフセット費用 @ ',
+    welcomeTitle:'ESGカーボンエージェント稼働中。',
+    welcomeBody:'カーボンクレジットのライフサイクル全体を管理します — 調査、ポートフォリオ、書類作成、モニタリング。GHGインベントリのない中小企業には、サイドバーの <code>🌱 スターターパッケージ</code> をご利用ください。',
+    welcomeEx1:'Borneo REDD+ VCS-1847 を調査 — 2,000トン、上限$15/t',
+    welcomeEx2:'Acme Corp 向けポートフォリオ構築 — $8万予算、GHGプロトコル、5,000 tCO₂e',
+    welcomeEx3:'VCS-2201 の償却証明書を生成 — 2,000トン',
+    pdfBadge:'VSME準拠 · スターターパッケージ · 中小企業向け',
+    pdfTitle:'ESGカーボンフットプリント・オフセットレポート',
+    pdfFwSuffix:' フレームワーク', pdfStarterReport:'スターターパッケージレポート',
+    pdfH1Profile:'1. 会社概要', pdfH1GHG:'2. GHG排出量推定値',
+    pdfH1Offset:'3. カーボンオフセットプログラム', pdfH1Net:'4. ネット排出量',
+    pdfCompanyName:'会社名', pdfIndustry:'業種',
+    pdfRevenue:'年間売上高（USD）', pdfEmployees:'従業員数',
+    pdfYear:'報告年度', pdfFramework:'報告フレームワーク', pdfReportDate:'レポート作成日',
+    pdfThScope:'スコープ', pdfThSource:'排出源', pdfThMethod:'算定方法', pdfThTCO2:'tCO₂e',
+    pdfS1Source:'固定燃焼・車両・製造プロセス',
+    pdfS2Source:'購入電力・熱',
+    pdfS3Source:'サプライチェーン・出張・廃棄物',
+    pdfS1Method:'売上高ベース業種原単位（15%）',
+    pdfS2MethodElec:'電気代 ÷ $0.12/kWh × 0.3 kg CO₂/kWh',
+    pdfS2MethodAvg:'業種平均（合計の25%）',
+    pdfS3Method:'売上高ベース残余',
+    pdfTotalGross:'総排出量',
+    pdfThProj:'プロジェクト', pdfThReg:'レジストリ', pdfThType:'種別',
+    pdfThVint:'年度', pdfThTonnes:'トン数', pdfThPrice:'単価/t', pdfThCost:'合計費用',
+    pdfCertTitle:'🏆 カーボンクレジット償却証明書',
+    pdfCertBene:'受益者', pdfCertProject:'プロジェクト', pdfCertRegistry:'レジストリ',
+    pdfCertVolume:'償却量', pdfCertVintage:'ヴィンテージ年',
+    pdfCertSerial:'シリアル番号', pdfCertTxId:'トランザクションID',
+    pdfCertDate:'償却日', pdfCertPurpose:'目的',
+    pdfCertPurposeVal:'スコープ1、2、3排出量の自主的オフセット FY',
+    pdfCertNote:'これらのカーボンクレジットは永久に償却され、再販・譲渡はできません。本番環境ではRegen Network / Verraレジストリのトランザクション記録にリンクされます。',
+    pdfGross:'総排出量', pdfLessOffsets:'控除：認証済みオフセット償却量',
+    pdfNetEmissions:'ネット排出量', pdfCarbonNeutral:'0.0 tCO₂e — カーボンニュートラル',
+    pdfTotalInvest:'オフセット総投資額',
+    pdfGhgNote:'数値は業種平均排出原単位に基づく推定値です。VSMEの予備報告に適しています。正式な第三者検証には実測データへの置き換えを推奨します。',
+    pdfVsme:'📋 VSME準拠声明\n本レポートは、中小企業向けVSME（任意中小企業）基準に準拠しており、温室効果ガス排出量とオフセット活動の簡易かつ信頼性のある評価を提供します。算定方法はGHGプロトコル企業基準のスコープ1、2、3の分類に従っています。',
+    pdfFooter:'ESGカーボンエージェント生成 — 自動カーボン管理プラットフォーム\n本レポートは、デモおよび計画目的のために業種平均排出原単位を使用して作成されました。正式な規制上の開示には、活動ベースのデータ収集とサードパーティによる検証を推奨します。\nレポート作成日：',
+    pdfFooterSuffix:' · 数値はすべてCO₂換算メートルトン（tCO₂e）',
+    pdfScope1Box:'スコープ1 · tCO₂e\n直接排出',
+    pdfScope2Box:'スコープ2 · tCO₂e\n電力',
+    pdfScope3Box:'スコープ3 · tCO₂e\nバリューチェーン',
+  }
+};
+
+// ══════════════════════════════════════════
+// LANGUAGE ENGINE  —  uses data-i18n attrs
+// ══════════════════════════════════════════
+let currentLang = 'en';
+
+function tr(key) {
+  return (LANG[currentLang] && LANG[currentLang][key] !== undefined)
+    ? LANG[currentLang][key]
+    : (LANG.en[key] !== undefined ? LANG.en[key] : key);
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+  applyLang();
+}
+
+function applyLang() {
+  // 1. All [data-i18n] elements — set textContent (skip <option> — handled separately)
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    if (el.tagName === 'OPTION') return; // options handled in block 4
+    try {
+      const key = el.getAttribute('data-i18n');
+      const val = tr(key);
+      if (val !== undefined) el.textContent = val;
+    } catch(e) { /* ignore individual element errors */ }
+  });
+
+  // 2. All [data-i18n-placeholder] — set placeholder
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    try { el.placeholder = tr(el.getAttribute('data-i18n-placeholder')); } catch(e) {}
+  });
+
+  // 3. Header status
+  document.getElementById('status-text').textContent = tr('agentOnline');
+
+  // 4. Industry dropdown options (values stay English for factor lookup)
+  const sel = document.getElementById('f-industry');
+  if (sel) {
+    sel.options[0].textContent = tr('selectIndustry');
+    const keys = ['indProfServices','indRetail','indManufacturing','indLogistics',
+                  'indRestaurant','indConstruction','indHealthcare','indOther'];
+    keys.forEach((k, i) => { if (sel.options[i+1]) sel.options[i+1].textContent = tr(k); });
+  }
+
+  // 5. Methodology box (has inner HTML)
+  const mb = document.getElementById('meth-box');
+  if (mb) mb.innerHTML = tr('methBoxHTML');
+
+  // 6. Credit names
+  const wn = document.getElementById('wind-name');
+  if (wn) wn.textContent = tr('windCreditName');
+  const ln = document.getElementById('landfill-name');
+  if (ln) ln.textContent = tr('landfillCreditName');
+
+  // 7. Retire button (only if not yet used)
+  const rb = document.getElementById('retire-btn');
+  if (rb && !S.retired) rb.textContent = tr('simulateBtn');
+
+  // 8. Update dynamic content if already rendered
+  if (S.total) {
+    livePreview();
+    updateOffsetCost();
+    if (S.step === 2) renderFootprint();
+  }
+}
+
+// ══════════════════════════════════════════
+// APP STATE & EMISSION FACTORS
+// ══════════════════════════════════════════
 const FACTORS = {
   'Professional Services':25,'Retail':45,'Manufacturing':120,
   'Logistics':200,'Restaurant/Food':35,'Construction':150,'Healthcare':40,'Other':50
 };
 const CREDITS = {
-  wind:    {name:'Wind Power India',  price:3.50,registry:'Gold Standard',type:'Renewable Energy',flag:'🇮🇳',vintage:'2023'},
-  landfill:{name:'Landfill Gas USA',  price:4.20,registry:'Verra VCS',    type:'Methane Capture', flag:'🇺🇸',vintage:'2023'}
+  wind:    {nameKey:'windCreditName',    price:3.50, registry:'Gold Standard', type:'Renewable Energy', flag:'🇮🇳', vintage:'2023'},
+  landfill:{nameKey:'landfillCreditName',price:4.20, registry:'Verra VCS',     type:'Methane Capture',  flag:'🇺🇸', vintage:'2023'}
 };
 const AVG_ELEC_RATE=0.12, CO2_PER_KWH=0.0003;
 
-// ═══ STATE ═══
-let S={
-  step:1,name:'',industry:'',revenue:0,employees:0,electricity:0,
-  year:'2024',framework:'VSME',
-  total:0,scope1:0,scope2:0,scope3:0,
-  credit:'wind',txId:null,serial:null,retired:false
+let S = {
+  step:1, name:'', industry:'', revenue:0, employees:0, electricity:0,
+  year:'2024', framework:'VSME',
+  total:0, scope1:0, scope2:0, scope3:0,
+  credit:'wind', txId:null, serial:null, retired:false
 };
 
-// ═══ PANEL SWITCHING ═══
-function showPanel(name,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-  if(el)el.classList.add('active');
-  const L={chat:'FULL DEPLOY',starter:'STARTER PACKAGE',research:'RESEARCH',portfolio:'PORTFOLIO',docs:'DOCUMENTATION',monitor:'MONITORING'};
-  document.getElementById('phaseLabel').innerHTML='MODE: <span>'+(L[name]||name.toUpperCase())+'</span>';
+// ══════════════════════════════════════════
+// PANEL SWITCHING
+// ══════════════════════════════════════════
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  const map = {chat:'FULL DEPLOY',starter:'STARTER PACKAGE',research:'RESEARCH',
+               portfolio:'PORTFOLIO',docs:'DOCUMENTATION',monitor:'MONITORING'};
+  document.getElementById('phaseLabel').innerHTML = 'MODE: <span>'+(map[name]||name.toUpperCase())+'</span>';
 }
 
-// ═══ CHAT MODE ═══
-let currentMode='full-deploy';
-function setChatMode(el,mode){
-  document.querySelectorAll('.mode-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');currentMode=mode;
-  document.getElementById('ctx-mode').textContent=mode;
+let currentMode = 'full-deploy';
+function setChatMode(el, mode) {
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentMode = mode;
+  document.getElementById('ctx-mode').textContent = mode;
 }
 
-// ═══ CALC ═══
-function calcEmissions(){
-  const f=FACTORS[S.industry]||50;
-  const revM=S.revenue/1e6;
-  let total=revM*f;
-  let s2=S.electricity>0?(S.electricity/AVG_ELEC_RATE)*12*CO2_PER_KWH:total*0.25;
-  let s1=total*0.15;
-  let s3=Math.max(0,total-s1-s2);
-  if(S.electricity>0){s1=total*0.15;s3=total*0.60;total=s1+s2+s3;}
-  S.scope1=Math.round(s1*10)/10;S.scope2=Math.round(s2*10)/10;S.scope3=Math.round(s3*10)/10;
-  S.total=Math.round((S.scope1+S.scope2+S.scope3)*10)/10;
-  return S.total;
+// ══════════════════════════════════════════
+// EMISSION CALC
+// ══════════════════════════════════════════
+function calcEmissions() {
+  const f = FACTORS[S.industry] || 50;
+  const revM = S.revenue / 1e6;
+  let total = revM * f;
+  let s2 = S.electricity > 0
+    ? (S.electricity / AVG_ELEC_RATE) * 12 * CO2_PER_KWH
+    : total * 0.25;
+  let s1 = total * 0.15;
+  let s3 = Math.max(0, total - s1 - s2);
+  if (S.electricity > 0) { s1 = total * 0.15; s3 = total * 0.60; total = s1 + s2 + s3; }
+  S.scope1 = Math.round(s1*10)/10;
+  S.scope2 = Math.round(s2*10)/10;
+  S.scope3 = Math.round(s3*10)/10;
+  S.total  = Math.round((S.scope1+S.scope2+S.scope3)*10)/10;
 }
 
-// ═══ LIVE PREVIEW ═══
-function livePreview(){
-  const name=document.getElementById('f-name').value;
-  const industry=document.getElementById('f-industry').value;
-  const revenue=parseFloat(document.getElementById('f-revenue').value)||0;
-  const employees=parseFloat(document.getElementById('f-employees').value)||0;
-  if(name) document.getElementById('sctx-client').textContent=name.slice(0,16);
-  if(industry) document.getElementById('sctx-industry').textContent=industry;
-  if(revenue) document.getElementById('sctx-revenue').textContent='$'+(revenue/1e6).toFixed(2)+'M';
-  if(employees) document.getElementById('sctx-employees').textContent=employees;
-  if(!industry||!revenue){
-    document.getElementById('preview-content').innerHTML='<div class="preview-empty"><span style="font-size:24px;">🌱</span>Fill all required fields to preview your estimate.</div>';
+// ══════════════════════════════════════════
+// LIVE PREVIEW
+// ══════════════════════════════════════════
+function livePreview() {
+  const name     = document.getElementById('f-name').value;
+  const industry = document.getElementById('f-industry').value;
+  const revenue  = parseFloat(document.getElementById('f-revenue').value) || 0;
+  const employees= parseFloat(document.getElementById('f-employees').value) || 0;
+
+  if (name) document.getElementById('sctx-client').textContent = name.slice(0,16);
+  if (industry) document.getElementById('sctx-industry').textContent = tr('ind'+industry.replace(/\//,'').replace(/ /g,'')) || industry;
+  if (revenue) document.getElementById('sctx-revenue').textContent = '$'+(revenue/1e6).toFixed(2)+'M';
+  if (employees) document.getElementById('sctx-employees').textContent = employees;
+
+  if (!industry || !revenue) {
+    document.getElementById('preview-content').innerHTML =
+      `<div class="preview-empty"><span style="font-size:24px;">🌱</span><span>${tr('previewEmpty')}</span></div>`;
     return;
   }
-  S.industry=industry;S.revenue=revenue;S.employees=employees;
+  S.industry=industry; S.revenue=revenue; S.employees=employees;
   S.electricity=parseFloat(document.getElementById('f-electricity').value)||0;
   calcEmissions();
-  const cp=CREDITS[S.credit].price;
-  const cost=(S.total*cp).toFixed(2);
-  document.getElementById('sctx-tonnes').textContent=S.total.toLocaleString()+' t';
-  document.getElementById('sctx-cost').textContent='$'+parseFloat(cost).toLocaleString();
-  const p1=Math.round(S.scope1/S.total*100),p2=Math.round(S.scope2/S.total*100),p3=100-p1-p2;
-  document.getElementById('preview-content').innerHTML=`
-    <div class="preview-metric"><div class="pm-label">Total Footprint</div><div class="pm-value teal">${S.total.toLocaleString()} tCO₂e</div></div>
-    <div class="preview-metric"><div class="pm-label">Scope 1 — Direct</div><div class="pm-value" style="font-size:13px">${S.scope1.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p1}%)</span></div></div>
-    <div class="preview-metric"><div class="pm-label">Scope 2 — Electricity</div><div class="pm-value" style="font-size:13px">${S.scope2.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p2}%)</span></div></div>
-    <div class="preview-metric"><div class="pm-label">Scope 3 — Supply Chain</div><div class="pm-value" style="font-size:13px">${S.scope3.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p3}%)</span></div></div>
-    <div class="preview-metric" style="border-color:rgba(0,232,122,.25)"><div class="pm-label">Offset Cost @ $${cp}/t</div><div class="pm-value green">$${parseFloat(cost).toLocaleString()}</div></div>`;
+
+  const cp = CREDITS[S.credit].price;
+  const cost = (S.total * cp).toFixed(2);
+  document.getElementById('sctx-tonnes').textContent = S.total.toLocaleString()+' t';
+  document.getElementById('sctx-cost').textContent = '$'+parseFloat(cost).toLocaleString();
+
+  const p1=Math.round(S.scope1/S.total*100), p2=Math.round(S.scope2/S.total*100), p3=100-p1-p2;
+  document.getElementById('preview-content').innerHTML = `
+    <div class="preview-metric"><div class="pm-label">${tr('totalAnnual')}</div><div class="pm-value teal">${S.total.toLocaleString()} tCO₂e</div></div>
+    <div class="preview-metric"><div class="pm-label">${tr('scope1Label')}</div><div class="pm-value" style="font-size:13px">${S.scope1.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p1}%)</span></div></div>
+    <div class="preview-metric"><div class="pm-label">${tr('scope2Label')}</div><div class="pm-value" style="font-size:13px">${S.scope2.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p2}%)</span></div></div>
+    <div class="preview-metric"><div class="pm-label">${tr('scope3Label')}</div><div class="pm-value" style="font-size:13px">${S.scope3.toLocaleString()} t <span style="color:var(--text-muted);font-size:11px">(${p3}%)</span></div></div>
+    <div class="preview-metric" style="border-color:rgba(0,232,122,.25)"><div class="pm-label">${tr('offsetCostAt')}$${cp}/t</div><div class="pm-value green">$${parseFloat(cost).toLocaleString()}</div></div>`;
 }
 
-// ═══ STEP NAVIGATION ═══
-function goToStep1(){
-  show1();setStarterStep(1);
-}
-function goToStep2(){
+// ══════════════════════════════════════════
+// STEP NAVIGATION
+// ══════════════════════════════════════════
+function goToStep1() { showStep(1); }
+function goToStep2() {
   const name=document.getElementById('f-name').value.trim();
   const industry=document.getElementById('f-industry').value;
   const revenue=parseFloat(document.getElementById('f-revenue').value);
   const employees=parseFloat(document.getElementById('f-employees').value);
-  if(!name||!industry||!revenue||!employees){alert('Please fill in all required fields (marked ★) before continuing.');return;}
-  S.name=name;S.industry=industry;S.revenue=revenue;S.employees=employees;
+  if (!name||!industry||!revenue||!employees) {
+    alert(currentLang==='ja'
+      ? '必須項目（★）をすべて入力してください。'
+      : 'Please fill in all required fields (*) before continuing.');
+    return;
+  }
+  S.name=name; S.industry=industry; S.revenue=revenue; S.employees=employees;
   S.electricity=parseFloat(document.getElementById('f-electricity').value)||0;
   S.year=document.getElementById('f-year').value;
   S.framework=document.getElementById('f-framework').value;
-  calcEmissions();renderFootprint();
-  show2();setStarterStep(2);updateOffsetCost();
+  calcEmissions(); renderFootprint();
+  showStep(2); updateOffsetCost();
 }
-function goToStep3(){show3();setStarterStep(3);updateOffsetCost();}
-function show1(){document.getElementById('s-step1').style.display='';document.getElementById('s-step2').style.display='none';document.getElementById('s-step3').style.display='none';}
-function show2(){document.getElementById('s-step1').style.display='none';document.getElementById('s-step2').style.display='';document.getElementById('s-step3').style.display='none';}
-function show3(){document.getElementById('s-step1').style.display='none';document.getElementById('s-step2').style.display='none';document.getElementById('s-step3').style.display='';}
+function goToStep3() { showStep(3); updateOffsetCost(); }
 
-function setStarterStep(n){
-  S.step=n;
-  [1,2,3].forEach(i=>{
-    const el=document.getElementById('sstep-'+i);
-    el.classList.remove('s-active','s-done');
-    if(i<n)el.classList.add('s-done');else if(i===n)el.classList.add('s-active');
+function showStep(n) {
+  S.step = n;
+  [1,2,3].forEach(i => {
+    document.getElementById('s-step'+i).style.display = (i===n) ? '' : 'none';
+    const tab = document.getElementById('sstep-'+i);
+    tab.classList.remove('s-active','s-done');
+    if (i < n) tab.classList.add('s-done');
+    else if (i === n) tab.classList.add('s-active');
   });
-  const phases=['collect','estimate','offset'];
-  phases.forEach((p,i)=>{
-    const d=document.getElementById('sdot-'+p),l=document.getElementById('slbl-'+p);
-    d.className='pipe-dot';l.className='pipe-label';
-    if(i+1<n){d.classList.add('teal-done');l.classList.add('teal-done');}
-    else if(i+1===n){d.classList.add('active');l.classList.add('active');}
+  const phases = ['collect','estimate','offset'];
+  phases.forEach((p,i) => {
+    const d=document.getElementById('sdot-'+p), l=document.getElementById('slbl-'+p);
+    d.className='pipe-dot'; l.className='pipe-label';
+    if (i+1<n) { d.classList.add('teal-done'); l.classList.add('teal-done'); }
+    else if (i+1===n) { d.classList.add('active'); l.classList.add('active'); }
     else d.classList.add('pending');
   });
 }
 
-function renderFootprint(){
-  const {scope1,scope2,scope3,total,industry,revenue,employees}=S;
-  const t=total;
-  const p1=Math.round(scope1/t*100),p2=Math.round(scope2/t*100),p3=100-p1-p2;
-  document.getElementById('s2-sub').textContent=`${industry} · $${(revenue/1e6).toFixed(2)}M · ${employees} employees · VSME STARTER PACKAGE`;
-  document.getElementById('footprint-results').innerHTML=`
+function renderFootprint() {
+  const {scope1,scope2,scope3,total,industry,revenue,employees} = S;
+  const p1=Math.round(scope1/total*100), p2=Math.round(scope2/total*100), p3=100-p1-p2;
+  document.getElementById('s2-sub').textContent =
+    `${industry} · $${(revenue/1e6).toFixed(2)}M · ${employees} ${currentLang==='ja'?'名':'employees'} · VSME`;
+  document.getElementById('footprint-results').innerHTML = `
     <div class="result-card teal-card">
-      <div class="result-label">Total Estimated Annual Footprint</div>
-      <div class="result-value teal">${t.toLocaleString()} tCO₂e</div>
-      <div class="result-sub">Scope 1+2+3 · ${S.year} · Industry-average methodology</div>
+      <div class="result-label">${tr('totalAnnual')}</div>
+      <div class="result-value teal">${total.toLocaleString()} tCO₂e</div>
+      <div class="result-sub">${tr('scope123')} · ${S.year} · ${tr('industryAvg')}</div>
       <div class="scope-bar">
         <div class="scope-row"><div class="scope-name">Scope 1</div><div class="scope-track"><div class="scope-fill s1" style="width:${p1}%"></div></div><div class="scope-num">${scope1.toLocaleString()} t</div></div>
         <div class="scope-row"><div class="scope-name">Scope 2</div><div class="scope-track"><div class="scope-fill s2" style="width:${p2}%"></div></div><div class="scope-num">${scope2.toLocaleString()} t</div></div>
@@ -800,152 +1102,207 @@ function renderFootprint(){
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-      <div class="result-card"><div class="result-label">Emission Factor</div><div class="result-value" style="font-size:18px">${FACTORS[industry]||50} t</div><div class="result-sub">per $1M revenue</div></div>
-      <div class="result-card"><div class="result-label">Per Employee</div><div class="result-value" style="font-size:18px">${(t/employees).toFixed(1)} t</div><div class="result-sub">tCO₂e per person</div></div>
-      <div class="result-card"><div class="result-label">Revenue Intensity</div><div class="result-value" style="font-size:18px">${(t/(revenue/1e6)).toFixed(0)} t</div><div class="result-sub">per $1M revenue</div></div>
+      <div class="result-card"><div class="result-label">${tr('emFactor')}</div><div class="result-value" style="font-size:18px">${FACTORS[industry]||50} t</div><div class="result-sub">${tr('perRevM')}</div></div>
+      <div class="result-card"><div class="result-label">${tr('perEmployee')}</div><div class="result-value" style="font-size:18px">${(total/employees).toFixed(1)} t</div><div class="result-sub">${tr('perPerson')}</div></div>
+      <div class="result-card"><div class="result-label">${tr('revIntensity')}</div><div class="result-value" style="font-size:18px">${(total/(revenue/1e6)).toFixed(0)} t</div><div class="result-sub">${tr('perRevM2')}</div></div>
     </div>`;
+  // Refresh the meth-box with current language
+  const mb = document.getElementById('meth-box');
+  if (mb) mb.innerHTML = tr('methBoxHTML');
 }
 
-// ═══ CREDIT SELECTOR ═══
-function selectCredit(key){
-  S.credit=key;
-  document.getElementById('cc-wind').classList.toggle('selected',key==='wind');
-  document.getElementById('cc-landfill').classList.toggle('selected',key==='landfill');
-  updateOffsetCost();livePreview();
+// ══════════════════════════════════════════
+// CREDIT SELECTOR
+// ══════════════════════════════════════════
+function selectCredit(key) {
+  S.credit = key;
+  document.getElementById('cc-wind').classList.toggle('selected', key==='wind');
+  document.getElementById('cc-landfill').classList.toggle('selected', key==='landfill');
+  updateOffsetCost(); livePreview();
 }
-function updateOffsetCost(){
-  const c=CREDITS[S.credit];const t=S.total;if(!t)return;
-  const cost=(t*c.price).toFixed(2);
-  document.getElementById('offset-total-val').textContent='$'+parseFloat(cost).toLocaleString('en-US',{minimumFractionDigits:2});
-  document.getElementById('offset-total-sub').textContent=`${t.toLocaleString()} tCO₂e × $${c.price}/t · ${c.name}`;
-  document.getElementById('sctx-cost').textContent='$'+parseFloat(cost).toLocaleString();
+function updateOffsetCost() {
+  const c = CREDITS[S.credit]; const t = S.total;
+  if (!t) return;
+  const cost = (t * c.price).toFixed(2);
+  document.getElementById('offset-total-val').textContent = '$'+parseFloat(cost).toLocaleString('en-US',{minimumFractionDigits:2});
+  document.getElementById('offset-total-sub').textContent =
+    `${t.toLocaleString()} tCO₂e × $${c.price}/t · ${tr(c.nameKey)}`;
+  document.getElementById('sctx-cost').textContent = '$'+parseFloat(cost).toLocaleString();
 }
 
-// ═══ SIMULATE RETIREMENT ═══
-function simulateRetirement(){
-  const btn=document.getElementById('retire-btn');
-  btn.textContent='⏳ Processing...';btn.disabled=true;
-  setTimeout(()=>{
-    const c=CREDITS[S.credit];
-    const txId='RGN-'+Math.random().toString(36).substr(2,6).toUpperCase()+'-'+Date.now().toString().slice(-5);
-    const pfx=c.name.replace(/\s/g,'').slice(0,3).toUpperCase();
-    const serial=pfx+'-'+S.year+'-'+String(Math.floor(Math.random()*90000)+10000)+' to '+pfx+'-'+S.year+'-'+String(Math.floor(Math.random()*90000)+10000);
-    const today=new Date().toISOString().slice(0,10);
-    S.txId=txId;S.serial=serial;S.retired=true;
-    const cost=(S.total*c.price).toFixed(2);
-    document.getElementById('tx-success-area').innerHTML=`
+// ══════════════════════════════════════════
+// SIMULATE RETIREMENT
+// ══════════════════════════════════════════
+function simulateRetirement() {
+  const btn = document.getElementById('retire-btn');
+  btn.textContent = currentLang==='ja' ? '⏳ 処理中...' : '⏳ Processing...';
+  btn.disabled = true;
+  setTimeout(() => {
+    const c = CREDITS[S.credit];
+    const txId = 'RGN-'+Math.random().toString(36).substr(2,6).toUpperCase()+'-'+Date.now().toString().slice(-5);
+    const pfx = tr(c.nameKey).replace(/\s/g,'').slice(0,3).toUpperCase();
+    const serial = pfx+'-'+S.year+'-'+String(Math.floor(Math.random()*90000)+10000)+
+                   ' to '+pfx+'-'+S.year+'-'+String(Math.floor(Math.random()*90000)+10000);
+    const today = new Date().toISOString().slice(0,10);
+    const cost = (S.total * c.price).toFixed(2);
+    S.txId=txId; S.serial=serial; S.retired=true;
+    document.getElementById('tx-success-area').innerHTML = `
       <div class="tx-success">
-        <div class="tx-title">✅ Retirement Simulated Successfully</div>
-        <div class="tx-row"><span class="tx-key">Transaction ID</span><span class="tx-val">${txId}</span></div>
-        <div class="tx-row"><span class="tx-key">Project</span><span class="tx-val">${c.name}</span></div>
-        <div class="tx-row"><span class="tx-key">Serial Numbers</span><span class="tx-val">${serial}</span></div>
-        <div class="tx-row"><span class="tx-key">Tonnes Retired</span><span class="tx-val">${S.total.toLocaleString()} tCO₂e</span></div>
-        <div class="tx-row"><span class="tx-key">Total Cost</span><span class="tx-val">$${parseFloat(cost).toLocaleString()}</span></div>
-        <div class="tx-row"><span class="tx-key">Retirement Date</span><span class="tx-val">${today}</span></div>
-        <div class="tx-row"><span class="tx-key">Beneficiary</span><span class="tx-val">${S.name}</span></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:10px;">SIMULATED · Will connect to Regen Network MCP / Verra registry in production</div>
+        <div class="tx-title">${tr('retiredTitle')}</div>
+        <div class="tx-row"><span class="tx-key">${tr('txId')}</span><span class="tx-val">${txId}</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txProject')}</span><span class="tx-val">${tr(c.nameKey)}</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txSerial')}</span><span class="tx-val">${serial}</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txTonnes')}</span><span class="tx-val">${S.total.toLocaleString()} tCO₂e</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txCost')}</span><span class="tx-val">$${parseFloat(cost).toLocaleString()}</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txDate')}</span><span class="tx-val">${today}</span></div>
+        <div class="tx-row"><span class="tx-key">${tr('txBene')}</span><span class="tx-val">${S.name}</span></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:10px;">${tr('txNote')}</div>
       </div>`;
-    btn.textContent='✓ Retired';btn.style.background='var(--green-dim)';btn.style.opacity='.7';
+    btn.textContent = tr('retiredBtnText');
+    btn.style.background='var(--green-dim)'; btn.style.opacity='.7';
     document.getElementById('sdot-offset').className='pipe-dot teal-done';
     document.getElementById('slbl-offset').className='pipe-label teal-done';
-  },1800);
+  }, 1800);
 }
 
-// ═══ PDF GENERATION ═══
-function generatePDF(){
-  if(!S.total){alert('Please complete Steps 1 & 2 before generating the report.');return;}
-  const c=CREDITS[S.credit];
-  const cost=(S.total*c.price).toFixed(2);
-  const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
-  const txId=S.txId||'PENDING-'+Math.random().toString(36).substr(2,6).toUpperCase();
-  const serial=S.serial||'Pending retirement confirmation';
-  document.getElementById('r-date').textContent=today;
-  document.getElementById('r-fw-label').textContent=S.framework+' Framework';
-  document.getElementById('r-title').textContent=`ESG Carbon Footprint & Offset Report — ${S.year}`;
-  document.getElementById('r-client-line').textContent=`${S.name} · ${S.industry} · ${S.employees} employees · $${(S.revenue/1e6).toFixed(2)}M annual revenue`;
-  document.getElementById('r-footer-date').textContent=today;
-  document.getElementById('r-profile-table').innerHTML=`
-    <tr><td><strong>Company Name</strong></td><td>${S.name}</td></tr>
-    <tr><td><strong>Industry Sector</strong></td><td>${S.industry}</td></tr>
-    <tr><td><strong>Annual Revenue (USD)</strong></td><td>$${S.revenue.toLocaleString()}</td></tr>
-    <tr><td><strong>Number of Employees</strong></td><td>${S.employees.toLocaleString()}</td></tr>
-    <tr><td><strong>Reporting Year</strong></td><td>${S.year}</td></tr>
-    <tr><td><strong>Reporting Framework</strong></td><td>${S.framework}</td></tr>
-    <tr><td><strong>Report Date</strong></td><td>${today}</td></tr>`;
-  document.getElementById('r-scope-grid').innerHTML=`
-    <div class="r-scope-box"><div class="r-scope-num">${S.scope1.toLocaleString()}</div><div class="r-scope-label">Scope 1 · tCO₂e<br>Direct Emissions</div></div>
-    <div class="r-scope-box"><div class="r-scope-num">${S.scope2.toLocaleString()}</div><div class="r-scope-label">Scope 2 · tCO₂e<br>Electricity</div></div>
-    <div class="r-scope-box"><div class="r-scope-num">${S.scope3.toLocaleString()}</div><div class="r-scope-label">Scope 3 · tCO₂e<br>Value Chain</div></div>`;
-  document.getElementById('r-emissions-table').innerHTML=`
-    <tr><td>Scope 1</td><td>Stationary combustion, fleet, process</td><td>Revenue-based industry factor (15%)</td><td><strong>${S.scope1.toLocaleString()}</strong></td></tr>
-    <tr><td>Scope 2</td><td>Purchased electricity &amp; heat</td><td>${S.electricity>0?'Electricity spend ÷ $0.12/kWh × 0.3 kg CO₂/kWh':'Industry benchmark (25% of total)'}</td><td><strong>${S.scope2.toLocaleString()}</strong></td></tr>
-    <tr><td>Scope 3</td><td>Supply chain, business travel, waste</td><td>Revenue-based residual</td><td><strong>${S.scope3.toLocaleString()}</strong></td></tr>
-    <tr style="background:#D6EBE0"><td colspan="3"><strong>Total Gross Emissions</strong></td><td><strong>${S.total.toLocaleString()} tCO₂e</strong></td></tr>`;
-  document.getElementById('r-offset-table').innerHTML=`
-    <tr><td>${c.flag} ${c.name}</td><td>${c.registry}</td><td>${c.type}</td><td>${c.vintage}</td><td>${S.total.toLocaleString()}</td><td>$${c.price.toFixed(2)}</td><td><strong>$${parseFloat(cost).toLocaleString()}</strong></td></tr>`;
-  document.getElementById('r-cert-rows').innerHTML=`
-    <div class="r-cert-row"><span class="r-cert-key">Beneficiary</span><span class="r-cert-val">${S.name}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Project</span><span class="r-cert-val">${c.flag} ${c.name}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Registry</span><span class="r-cert-val">${c.registry}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Volume Retired</span><span class="r-cert-val">${S.total.toLocaleString()} tCO₂e</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Vintage Year</span><span class="r-cert-val">${c.vintage}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Serial Numbers</span><span class="r-cert-val">${serial}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Transaction ID</span><span class="r-cert-val">${txId}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Retirement Date</span><span class="r-cert-val">${today}</span></div>
-    <div class="r-cert-row"><span class="r-cert-key">Purpose</span><span class="r-cert-val">Voluntary offsetting of Scope 1, 2 &amp; 3 emissions, FY${S.year}</span></div>`;
-  document.getElementById('r-net-table').innerHTML=`
-    <tr><td>Gross Emissions</td><td>${S.total.toLocaleString()} tCO₂e</td></tr>
-    <tr><td>Less: Verified Offsets Retired</td><td>(${S.total.toLocaleString()}) tCO₂e</td></tr>
-    <tr style="background:#D6EBE0"><td><strong>Net Emissions</strong></td><td><strong>0.0 tCO₂e — Carbon Neutral</strong></td></tr>
-    <tr><td>Total Offset Investment</td><td>$${parseFloat(cost).toLocaleString()}</td></tr>`;
-  const el=document.getElementById('pdf-report');
-  el.style.display='block';el.style.position='fixed';el.style.left='-9999px';el.style.top='0';
+// ══════════════════════════════════════════
+// PDF GENERATION
+// ══════════════════════════════════════════
+function generatePDF() {
+  if (!S.total) {
+    alert(currentLang==='ja'
+      ? 'PDFを生成する前にステップ1と2を完了してください。'
+      : 'Please complete Steps 1 & 2 before generating the report.');
+    return;
+  }
+  const c = CREDITS[S.credit];
+  const cost = (S.total * c.price).toFixed(2);
+  const today = new Date().toLocaleDateString(
+    currentLang==='ja' ? 'ja-JP' : 'en-GB',
+    {day:'2-digit',month:'long',year:'numeric'});
+  const txId = S.txId || 'PENDING-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const serial = S.serial || (currentLang==='ja' ? '償却確認待ち' : 'Pending retirement confirmation');
+
+  document.getElementById('r-date').textContent = today;
+  document.getElementById('r-fw-label').textContent = S.framework + tr('pdfFwSuffix');
+  document.getElementById('r-starter-label').textContent = tr('pdfStarterReport');
+  document.getElementById('r-badge').textContent = tr('pdfBadge');
+  document.getElementById('r-title').textContent = tr('pdfTitle')+' — '+S.year;
+  document.getElementById('r-client-line').textContent =
+    `${S.name} · ${S.industry} · ${S.employees}${currentLang==='ja'?' 名':' employees'} · $${(S.revenue/1e6).toFixed(2)}M`;
+  document.getElementById('r-h2-profile').textContent = tr('pdfH1Profile');
+  document.getElementById('r-h2-ghg').textContent    = tr('pdfH1GHG');
+  document.getElementById('r-h2-offset').textContent  = tr('pdfH1Offset');
+  document.getElementById('r-h2-net').textContent     = tr('pdfH1Net');
+  document.getElementById('r-th-scope').textContent   = tr('pdfThScope');
+  document.getElementById('r-th-source').textContent  = tr('pdfThSource');
+  document.getElementById('r-th-method').textContent  = tr('pdfThMethod');
+  document.getElementById('r-th-tco2').textContent    = tr('pdfThTCO2');
+  document.getElementById('r-th-proj').textContent    = tr('pdfThProj');
+  document.getElementById('r-th-reg').textContent     = tr('pdfThReg');
+  document.getElementById('r-th-type').textContent    = tr('pdfThType');
+  document.getElementById('r-th-vint').textContent    = tr('pdfThVint');
+  document.getElementById('r-th-tonnes').textContent  = tr('pdfThTonnes');
+  document.getElementById('r-th-price').textContent   = tr('pdfThPrice');
+  document.getElementById('r-th-cost').textContent    = tr('pdfThCost');
+  document.getElementById('r-cert-title').textContent = tr('pdfCertTitle');
+  document.getElementById('r-cert-note').textContent  = tr('pdfCertNote');
+  document.getElementById('r-ghg-note').textContent   = tr('pdfGhgNote');
+  document.getElementById('r-vsme-text').textContent  = tr('pdfVsme');
+  document.getElementById('r-footer-text').textContent= tr('pdfFooter')+today+tr('pdfFooterSuffix');
+  document.getElementById('r-footer-date').textContent= today;
+
+  const sb1 = tr('pdfScope1Box').split('\n');
+  const sb2 = tr('pdfScope2Box').split('\n');
+  const sb3 = tr('pdfScope3Box').split('\n');
+  document.getElementById('r-scope-grid').innerHTML = `
+    <div class="r-scope-box"><div class="r-scope-num">${S.scope1.toLocaleString()}</div><div class="r-scope-label">${sb1[0]}<br>${sb1[1]||''}</div></div>
+    <div class="r-scope-box"><div class="r-scope-num">${S.scope2.toLocaleString()}</div><div class="r-scope-label">${sb2[0]}<br>${sb2[1]||''}</div></div>
+    <div class="r-scope-box"><div class="r-scope-num">${S.scope3.toLocaleString()}</div><div class="r-scope-label">${sb3[0]}<br>${sb3[1]||''}</div></div>`;
+
+  document.getElementById('r-profile-table').innerHTML = `
+    <tr><td><strong>${tr('pdfCompanyName')}</strong></td><td>${S.name}</td></tr>
+    <tr><td><strong>${tr('pdfIndustry')}</strong></td><td>${S.industry}</td></tr>
+    <tr><td><strong>${tr('pdfRevenue')}</strong></td><td>$${S.revenue.toLocaleString()}</td></tr>
+    <tr><td><strong>${tr('pdfEmployees')}</strong></td><td>${S.employees.toLocaleString()}</td></tr>
+    <tr><td><strong>${tr('pdfYear')}</strong></td><td>${S.year}</td></tr>
+    <tr><td><strong>${tr('pdfFramework')}</strong></td><td>${S.framework}</td></tr>
+    <tr><td><strong>${tr('pdfReportDate')}</strong></td><td>${today}</td></tr>`;
+
+  document.getElementById('r-emissions-table').innerHTML = `
+    <tr><td>${tr('pdfThScope')} 1</td><td>${tr('pdfS1Source')}</td><td>${tr('pdfS1Method')}</td><td><strong>${S.scope1.toLocaleString()}</strong></td></tr>
+    <tr><td>${tr('pdfThScope')} 2</td><td>${tr('pdfS2Source')}</td><td>${S.electricity>0?tr('pdfS2MethodElec'):tr('pdfS2MethodAvg')}</td><td><strong>${S.scope2.toLocaleString()}</strong></td></tr>
+    <tr><td>${tr('pdfThScope')} 3</td><td>${tr('pdfS3Source')}</td><td>${tr('pdfS3Method')}</td><td><strong>${S.scope3.toLocaleString()}</strong></td></tr>
+    <tr style="background:#D6EBE0"><td colspan="3"><strong>${tr('pdfTotalGross')}</strong></td><td><strong>${S.total.toLocaleString()} tCO₂e</strong></td></tr>`;
+
+  document.getElementById('r-offset-table').innerHTML = `
+    <tr><td>${c.flag} ${tr(c.nameKey)}</td><td>${c.registry}</td><td>${c.type}</td><td>${c.vintage}</td><td>${S.total.toLocaleString()}</td><td>$${c.price.toFixed(2)}</td><td><strong>$${parseFloat(cost).toLocaleString()}</strong></td></tr>`;
+
+  document.getElementById('r-cert-rows').innerHTML = `
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertBene')}</span><span class="r-cert-val">${S.name}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertProject')}</span><span class="r-cert-val">${c.flag} ${tr(c.nameKey)}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertRegistry')}</span><span class="r-cert-val">${c.registry}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertVolume')}</span><span class="r-cert-val">${S.total.toLocaleString()} tCO₂e</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertVintage')}</span><span class="r-cert-val">${c.vintage}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertSerial')}</span><span class="r-cert-val">${serial}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertTxId')}</span><span class="r-cert-val">${txId}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertDate')}</span><span class="r-cert-val">${today}</span></div>
+    <div class="r-cert-row"><span class="r-cert-key">${tr('pdfCertPurpose')}</span><span class="r-cert-val">${tr('pdfCertPurposeVal')}${S.year}</span></div>`;
+
+  document.getElementById('r-net-table').innerHTML = `
+    <tr><td>${tr('pdfGross')}</td><td>${S.total.toLocaleString()} tCO₂e</td></tr>
+    <tr><td>${tr('pdfLessOffsets')}</td><td>(${S.total.toLocaleString()}) tCO₂e</td></tr>
+    <tr style="background:#D6EBE0"><td><strong>${tr('pdfNetEmissions')}</strong></td><td><strong>${tr('pdfCarbonNeutral')}</strong></td></tr>
+    <tr><td>${tr('pdfTotalInvest')}</td><td>$${parseFloat(cost).toLocaleString()}</td></tr>`;
+
+  const el = document.getElementById('pdf-report');
+  el.style.display='block'; el.style.position='fixed'; el.style.left='-9999px'; el.style.top='0';
   html2pdf().set({
     margin:[10,10,10,10],
     filename:`ESG-Report-${S.name.replace(/\s+/g,'-')}-${S.year}.pdf`,
     image:{type:'jpeg',quality:.98},
     html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-  }).from(el).save().then(()=>{el.style.display='none';});
+  }).from(el).save().then(() => { el.style.display='none'; });
 }
 
-// ═══ CHAT ENGINE ═══
+// ══════════════════════════════════════════
+// CHAT ENGINE
+// ══════════════════════════════════════════
 const API_URL="https://api.anthropic.com/v1/messages";
-const SYS=`You are the ESG Carbon Agent — professional AI for automated carbon credit lifecycle management. You support:
-- Full Deploy: Research → Portfolio → Documentation → Monitoring
-- Starter Package: SMB onboarding using industry-average emission factors, low-cost credits ($3-5/t), VSME reporting
-For research: score projects 0-50. For portfolio: recommend 3-5 projects. For docs: generate agreements/certificates/disclosures. For monitoring: track deadlines and alerts. For starter: explain footprint estimates, VSME reporting, and carbon credit basics to non-experts. Be clear, structured, and actionable.`;
-let history=[],isLoading=false;
+const SYS=`You are the ESG Carbon Agent — professional AI for automated carbon credit lifecycle management. You support Full Deploy (research, portfolio, documentation, monitoring) and a Starter Package for SMBs using industry-average emission factors and low-cost credits. Respond in the same language as the user — if they write in Japanese, respond fully in Japanese.`;
+let history=[], isLoading=false;
 
 function getTime(){return new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}
+
 function addMessage(role,content){
-  const messages=document.getElementById('messages');
-  const msg=document.createElement('div');msg.className='msg';
-  const isA=role==='agent';
-  msg.innerHTML=`<div class="msg-avatar ${isA?'agent':'user'}">${isA?'⬡':'✦'}</div><div class="msg-content"><div class="msg-header"><span class="msg-name ${isA?'agent':'user'}">${isA?'ESG AGENT':'YOU'}</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><p>${fmt(content)}</p></div></div>`;
-  messages.appendChild(msg);messages.scrollTop=messages.scrollHeight;return msg;
+  const m=document.getElementById('messages');
+  const div=document.createElement('div'); div.className='msg';
+  const a=role==='agent';
+  div.innerHTML=`<div class="msg-avatar ${a?'agent':'user'}">${a?'⬡':'✦'}</div><div class="msg-content"><div class="msg-header"><span class="msg-name ${a?'agent':'user'}">${a?'ESG AGENT':'YOU'}</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><p>${fmt(content)}</p></div></div>`;
+  m.appendChild(div); m.scrollTop=m.scrollHeight; return div;
 }
 function fmt(t){if(!t)return'';return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');}
 function addTyping(){const m=document.getElementById('messages'),d=document.createElement('div');d.className='msg';d.id='typing-indicator';d.innerHTML=`<div class="msg-avatar agent">⬡</div><div class="msg-content"><div class="msg-header"><span class="msg-name agent">ESG AGENT</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div></div>`;m.appendChild(d);m.scrollTop=m.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing-indicator');if(t)t.remove();}
 
 function ctxUpdate(text){
-  const cm=text.match(/(?:client|company|for)\s+(?:is\s+)?([A-Z][a-zA-Z\s&]+?)(?:\s+is|\s*,|\s*\.|\s*\n|$)/);
-  if(cm)document.getElementById('ctx-client').textContent=cm[1].trim().slice(0,16);
-  const vm=text.match(/(\d[\d,]+)\s*(?:tonnes?|tCO₂e)/i);if(vm)document.getElementById('ctx-volume').textContent=vm[1]+' t';
+  const cm=text.match(/(?:client|company|for|クライアント)\s*(?:is\s+)?([A-Z\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF][a-zA-Z\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s&]+?)(?:\s+is|\s*,|\s*\.|\s*\n|$)/);
+  if(cm) document.getElementById('ctx-client').textContent=cm[1].trim().slice(0,16);
+  const vm=text.match(/(\d[\d,]+)\s*(?:tonnes?|tCO₂e|トン)/i);if(vm)document.getElementById('ctx-volume').textContent=vm[1]+' t';
   const bm=text.match(/\$\s*([\d,]+(?:k|K|m|M)?)/);if(bm)document.getElementById('ctx-budget').textContent='$'+bm[1];
   const fm=text.match(/\b(GHG Protocol|CDP|GRI|SBTi|TCFD|VSME)\b/i);if(fm)document.getElementById('ctx-framework').textContent=fm[1];
+}
+function setPhase(p,s){
+  document.getElementById('dot-'+p).className='pipe-dot '+s;
+  document.getElementById('lbl-'+p).className='pipe-label '+(s==='done'?'done':s==='active'?'active':'');
 }
 function phaseUpdate(text){
   const l=text.toLowerCase();
   if(l.includes('score')&&l.includes('/50')){setPhase('research','done');setPhase('portfolio','active');}
   if(l.includes('portfolio')&&l.includes('%')){setPhase('portfolio','done');setPhase('docs','active');}
-  if(l.includes('purchase agreement')||l.includes('certificate')){setPhase('docs','done');setPhase('monitor','active');}
-  if(l.includes('monitoring')||l.includes('alert')){setPhase('monitor','done');}
-}
-function setPhase(p,s){
-  document.getElementById('dot-'+p).className='pipe-dot '+s;
-  document.getElementById('lbl-'+p).className='pipe-label '+(s==='done'?'done':s==='active'?'active':'');
+  if(l.includes('purchase agreement')||l.includes('certificate')||l.includes('契約')||l.includes('証明書')){setPhase('docs','done');setPhase('monitor','active');}
+  if(l.includes('monitoring')||l.includes('alert')||l.includes('モニタリング')){setPhase('monitor','done');}
 }
 
 async function sendMessage(){
@@ -957,9 +1314,10 @@ async function sendMessage(){
   history.push({role:'user',content:`[Mode: ${currentMode}]\n\n${text}`});
   addTyping();
   try{
-    const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:history,tools:[{type:'web_search_20250305',name:'web_search'}]})});
-    const data=await r.json();removeTyping();
-    let fullText='';const tools=[];
+    const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:history,tools:[{type:'web_search_20250305',name:'web_search'}]})});
+    const data=await r.json(); removeTyping();
+    let fullText=''; const tools=[];
     if(data.content){for(const b of data.content){if(b.type==='tool_use')tools.push(b);}for(const b of data.content){if(b.type==='text')fullText+=b.text;}}
     if(fullText||tools.length){
       addMessage('agent',fullText||'');
@@ -967,7 +1325,7 @@ async function sendMessage(){
       ctxUpdate(fullText);phaseUpdate(fullText);
     }
     history.push({role:'assistant',content:data.content||[{type:'text',text:fullText}]});
-  }catch(err){removeTyping();addMessage('agent',`⚠ Connection error: ${err.message}`);}
+  }catch(err){removeTyping();addMessage('agent',`⚠ ${err.message}`);}
   isLoading=false;document.getElementById('sendBtn').disabled=false;
 }
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
@@ -982,518 +1340,12 @@ function clearChat(){
 }
 function addWelcome(){
   const m=document.getElementById('messages'),div=document.createElement('div');div.className='msg';
-  div.innerHTML=`<div class="msg-avatar agent">⬡</div><div class="msg-content"><div class="msg-header"><span class="msg-name agent">ESG AGENT</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><p><strong>ESG Carbon Agent online.</strong> Full lifecycle carbon credit management — research, portfolio, documentation, monitoring. For SMBs with no GHG inventory, use <code>🌱 Starter Package</code> in the sidebar.</p><p><code>Research VCS-1847 Borneo REDD+ — 2,000 tonnes, $15/t ceiling</code><br><code>Build a balanced portfolio for Acme Corp — $80k, GHG Protocol, 5,000 tCO₂e</code><br><code>Generate retirement certificate for VCS-2201, 2,000 tonnes</code></p></div></div>`;
+  div.innerHTML=`<div class="msg-avatar agent">⬡</div><div class="msg-content"><div class="msg-header"><span class="msg-name agent">ESG AGENT</span><span class="msg-time">${getTime()}</span></div><div class="msg-body"><p><strong>${tr('welcomeTitle')}</strong> ${tr('welcomeBody')}</p><p><code>${tr('welcomeEx1')}</code><br><code>${tr('welcomeEx2')}</code><br><code>${tr('welcomeEx3')}</code></p></div></div>`;
   m.appendChild(div);
 }
+
+// Init
 addWelcome();
-
-// ═══ LANGUAGE / 言語切替 ═══
-let currentLang = 'en';
-
-const T = {
-  en: {
-    // Header & nav
-    agentOnline:        'AGENT ONLINE',
-    cmdCenter:          'Command Center',
-    starterPkg:         'Starter Package',
-    projResearch:       'Project Research',
-    portfolio:          'Portfolio',
-    documents:          'Documents',
-    monitoring:         'Monitoring',
-    resetSession:       'Reset Session',
-    // Mode pills
-    fullDeploy:         'Full Deploy',
-    research:           'Research',
-    portfolioPill:      'Portfolio',
-    docs:               'Docs',
-    monitor:            'Monitor',
-    monthlyRun:         'Monthly Run',
-    starter:            'Starter',
-    // Context sidebar
-    sessionCtx:         'SESSION CONTEXT',
-    client:             'Client',
-    mode:               'Mode',
-    volume:             'Volume',
-    budget:             'Budget',
-    framework:          'Framework',
-    phasePipeline:      'PHASE PIPELINE',
-    phaseResearch:      'Research',
-    phasePortfolio:     'Portfolio',
-    phaseDocs:          'Docs',
-    phaseMonitor:       'Monitoring',
-    // Starter context
-    starterCtx:         'STARTER CONTEXT',
-    industry:           'Industry',
-    revenue:            'Revenue',
-    employees:          'Employees',
-    estTonnes:          'Est. tCO₂e',
-    offsetCost:         'Offset Cost',
-    starterPipeline:    'STARTER PIPELINE',
-    dataCollection:     'Data Collection',
-    footprintEst:       'Footprint Estimate',
-    offsetReport:       'Offset & Report',
-    // Starter step tracker
-    step1Label:         'Data Collection',
-    step2Label:         'Footprint Estimate',
-    step3Label:         'Offset & Report',
-    // Step 1 form
-    clientInfo:         'Client Information',
-    step1Sub:           'VSME STARTER PACKAGE · STEP 1 OF 3 · No GHG inventory required',
-    clientName:         'Client / Company Name',
-    clientNamePh:       'e.g. Sunrise Bakery Ltd',
-    industrySector:     'Industry Sector',
-    selectIndustry:     '— Select industry —',
-    annualRevenue:      'Annual Revenue (USD)',
-    revenuePh:          'e.g. 2500000',
-    revenueHint:        'Enter full amount · e.g. 2500000 for $2.5M',
-    numEmployees:       'Number of Employees',
-    employeesPh:        'e.g. 24',
-    elecBill:           'Monthly Electricity Bill (USD)',
-    elecBillOpt:        'optional',
-    elecPh:             'e.g. 1200',
-    elecHint:           'Improves Scope 2 accuracy · uses $0.12/kWh grid rate',
-    reportingYear:      'Reporting Year',
-    esgFramework:       'ESG Framework',
-    calcFootprint:      'Calculate Footprint →',
-    usesAvg:            'Uses industry-average emission factors',
-    // Step 2
-    estFootprint:       'Estimated Carbon Footprint',
-    methNote:           'Methodology Note',
-    methText:           'Scope 1 · Direct combustion & fleet: estimated at 15% of total industry benchmark.\nScope 2 · Purchased electricity: from monthly electricity bill or industry average (25% of total).\nScope 3 · Supply chain, travel, waste: estimated as remainder via revenue-based factor.',
-    methWarn:           '⚠ Estimates only. Replace with metered data for formal verification.',
-    back:               '← Back',
-    selectOffsets:      'Select Offsets →',
-    // Step 3
-    selectCredits:      'Select Carbon Credits',
-    step3Sub:           'LOW-COST VERIFIED PROJECTS · STEP 3 OF 3',
-    totalOffsetCost:    'Total Offset Cost',
-    selectProject:      'Select a project to calculate',
-    simulateBtn:        '⬡ Simulate Credit Retirement',
-    regenNote:          'Connects to Regen Network MCP in production',
-    vsmeReport:         'VSME ESG Report',
-    reportSub:          'ONE-PAGE PDF WITH RETIREMENT CERTIFICATE',
-    generatePDF:        '⬇ Generate PDF Report',
-    // Retirement success
-    retiredSuccess:     '✅ Retirement Simulated Successfully',
-    txIdLabel:          'Transaction ID',
-    projectLabel:       'Project',
-    serialLabel:        'Serial Numbers',
-    tonnesLabel:        'Tonnes Retired',
-    totalCostLabel:     'Total Cost',
-    retireDateLabel:    'Retirement Date',
-    beneficiaryLabel:   'Beneficiary',
-    simNote:            'SIMULATED · Will connect to Regen Network MCP / Verra registry in production',
-    retired:            '✓ Retired',
-    // Preview
-    livePreview:        'Live Preview',
-    previewEmpty:       'Fill in the form to preview your carbon footprint estimate in real time.',
-    totalFootprint:     'Total Footprint',
-    scope1Direct:       'Scope 1 — Direct',
-    scope2Elec:         'Scope 2 — Electricity',
-    scope3Supply:       'Scope 3 — Supply Chain',
-    offsetCostAt:       'Offset Cost @ ',
-    // Footprint results
-    totalAnnual:        'Total Estimated Annual Footprint',
-    scope123:           'Scope 1+2+3 · ',
-    industryAvg:        'Industry-average methodology',
-    emFactor:           'Emission Factor',
-    perRevM:            'per $1M revenue',
-    perEmployee:        'Per Employee',
-    perPerson:          'tCO₂e per person',
-    revIntensity:       'Revenue Intensity',
-    perRevM2:           'per $1M revenue',
-    // Welcome message
-    welcomeTitle:       'ESG Carbon Agent online.',
-    welcomeBody:        'Full lifecycle carbon credit management — research, portfolio, documentation, monitoring. For SMBs with no GHG inventory, use <code>🌱 Starter Package</code> in the sidebar.',
-    // Industries
-    profServices:       'Professional Services',
-    retail:             'Retail',
-    manufacturing:      'Manufacturing',
-    logistics:          'Logistics',
-    restaurant:         'Restaurant/Food',
-    construction:       'Construction',
-    healthcare:         'Healthcare',
-    other:              'Other',
-    // Credits
-    windName:           'Wind Power India',
-    landfillName:       'Landfill Gas USA',
-    // PDF labels
-    pdfBadge:           'VSME Aligned · Starter Package · SMB Edition',
-    pdfTitle:           'ESG Carbon Footprint & Offset Report',
-    pdfFwLabel:         ' Framework',
-    pdfStarterReport:   'Starter Package Report',
-    pdfCompanyProfile:  '1. Company Profile',
-    pdfCompanyName:     'Company Name',
-    pdfIndustry:        'Industry Sector',
-    pdfRevenue:         'Annual Revenue (USD)',
-    pdfEmployees:       'Number of Employees',
-    pdfYear:            'Reporting Year',
-    pdfFramework:       'Reporting Framework',
-    pdfReportDate:      'Report Date',
-    pdfGHGTitle:        '2. Estimated GHG Emissions',
-    pdfScope1:          'Scope 1',
-    pdfScope2:          'Scope 2',
-    pdfScope3:          'Scope 3',
-    pdfS1Source:        'Stationary combustion, fleet, process',
-    pdfS2Source:        'Purchased electricity & heat',
-    pdfS3Source:        'Supply chain, business travel, waste',
-    pdfS1Method:        'Revenue-based industry factor (15%)',
-    pdfS2MethodElec:    'Electricity spend ÷ $0.12/kWh × 0.3 kg CO₂/kWh',
-    pdfS2MethodAvg:     'Industry benchmark (25% of total)',
-    pdfS3Method:        'Revenue-based residual',
-    pdfTotalGross:      'Total Gross Emissions',
-    pdfOffsetTitle:     '3. Carbon Offset Program',
-    pdfCertTitle:       '🏆 Carbon Credit Retirement Certificate',
-    pdfCertBene:        'Beneficiary',
-    pdfCertProject:     'Project',
-    pdfCertRegistry:    'Registry',
-    pdfCertVolume:      'Volume Retired',
-    pdfCertVintage:     'Vintage Year',
-    pdfCertSerial:      'Serial Numbers',
-    pdfCertTxId:        'Transaction ID',
-    pdfCertDate:        'Retirement Date',
-    pdfCertPurpose:     'Purpose',
-    pdfCertPurposeVal:  'Voluntary offsetting of Scope 1, 2 & 3 emissions, FY',
-    pdfCertNote:        'These carbon credits have been permanently retired and cannot be resold or transferred. In production, this certificate is linked to the Regen Network / Verra registry transaction record.',
-    pdfNetTitle:        '4. Net Emissions Position',
-    pdfGross:           'Gross Emissions',
-    pdfLessOffsets:     'Less: Verified Offsets Retired',
-    pdfNetEmissions:    'Net Emissions',
-    pdfCarbonNeutral:   '0.0 tCO₂e — Carbon Neutral',
-    pdfTotalInvest:     'Total Offset Investment',
-    pdfVsme:            '📋 VSME Alignment Statement\nThis report aligns with the VSME (Voluntary SME) standard for small and medium enterprises, providing a simplified but credible assessment of greenhouse gas emissions and offset activities. The methodology follows the GHG Protocol Corporate Standard for Scope 1, 2, and 3 emissions categorisation.',
-    pdfFooter:          'Generated by ESG Carbon Agent — Automated Carbon Management Platform\nThis report was prepared using industry-average emission factors for demonstration and planning purposes. For formal regulatory disclosure, activity-based data collection and third-party verification are recommended.\nReport generated: ',
-    pdfFooterSuffix:    ' · All figures in metric tonnes CO₂ equivalent (tCO₂e)',
-    pdfScopeLabel1:     'Scope 1 · tCO₂e\nDirect Emissions',
-    pdfScopeLabel2:     'Scope 2 · tCO₂e\nElectricity',
-    pdfScopeLabel3:     'Scope 3 · tCO₂e\nValue Chain',
-    pdfColProject:      'Project',pdfColRegistry:'Registry',pdfColType:'Type',pdfColVintage:'Vintage',pdfColTonnes:'Tonnes',pdfColPrice:'Price/t',pdfColCost:'Total Cost',
-    pdfColScope:'Scope',pdfColSource:'Emission Source',pdfColMethod:'Estimation Method',pdfColTCO2:'tCO₂e',
-    employees2:         ' employees',
-    annualRevenue2:     'annual revenue',
-  },
-
-  ja: {
-    agentOnline:        'エージェント稼働中',
-    cmdCenter:          'コマンドセンター',
-    starterPkg:         'スターターパッケージ',
-    projResearch:       'プロジェクト調査',
-    portfolio:          'ポートフォリオ',
-    documents:          '書類',
-    monitoring:         'モニタリング',
-    resetSession:       'セッションリセット',
-    fullDeploy:         '⚡ フル展開',
-    research:           '🔬 調査',
-    portfolioPill:      '◈ ポートフォリオ',
-    docs:               '📄 書類',
-    monitor:            '📡 監視',
-    monthlyRun:         '📊 月次レポート',
-    starter:            '🌱 スターター',
-    sessionCtx:         'セッション情報',
-    client:             'クライアント',
-    mode:               'モード',
-    volume:             '排出量',
-    budget:             '予算',
-    framework:          'フレームワーク',
-    phasePipeline:      'フェーズ',
-    phaseResearch:      '調査',
-    phasePortfolio:     'ポートフォリオ',
-    phaseDocs:          '書類',
-    phaseMonitor:       'モニタリング',
-    starterCtx:         'スターター情報',
-    industry:           '業種',
-    revenue:            '売上高',
-    employees:          '従業員数',
-    estTonnes:          '推定 tCO₂e',
-    offsetCost:         'オフセット費用',
-    starterPipeline:    'ステップ',
-    dataCollection:     'データ収集',
-    footprintEst:       'フットプリント算定',
-    offsetReport:       'オフセット・レポート',
-    step1Label:         'データ収集',
-    step2Label:         'フットプリント算定',
-    step3Label:         'オフセット・レポート',
-    clientInfo:         'クライアント情報',
-    step1Sub:           'VSMEスターターパッケージ · ステップ 1/3 · GHGインベントリ不要',
-    clientName:         'クライアント / 会社名',
-    clientNamePh:       '例：サンライズベーカリー株式会社',
-    industrySector:     '業種',
-    selectIndustry:     '— 業種を選択 —',
-    annualRevenue:      '年間売上高（USD）',
-    revenuePh:          '例：2500000',
-    revenueHint:        '金額をそのまま入力 · 例：250万ドルは 2500000',
-    numEmployees:       '従業員数',
-    employeesPh:        '例：24',
-    elecBill:           '月間電気代（USD）',
-    elecBillOpt:        '任意',
-    elecPh:             '例：1200',
-    elecHint:           'スコープ2の精度向上 · $0.12/kWh 電力単価を使用',
-    reportingYear:      '報告年度',
-    esgFramework:       'ESGフレームワーク',
-    calcFootprint:      'フットプリントを算定 →',
-    usesAvg:            '業種平均排出原単位を使用',
-    estFootprint:       '推定カーボンフットプリント',
-    methNote:           '算定方法の注記',
-    methText:           'スコープ1 · 直接燃焼・車両：業種ベンチマークの15%と推定\nスコープ2 · 購入電力：月間電気代から算定、または業種平均（合計の25%）\nスコープ3 · サプライチェーン・出張・廃棄物：売上高ベース原単位の残余',
-    methWarn:           '⚠ 推定値です。正式報告には実測データへの置き換えを推奨します。',
-    back:               '← 戻る',
-    selectOffsets:      'オフセットを選択 →',
-    selectCredits:      'カーボンクレジットを選択',
-    step3Sub:           '低価格認証済みプロジェクト · ステップ 3/3',
-    totalOffsetCost:    'オフセット総費用',
-    selectProject:      'プロジェクトを選択して計算',
-    simulateBtn:        '⬡ クレジット償却をシミュレート',
-    regenNote:          '本番環境では Regen Network MCP に接続予定',
-    vsmeReport:         'VSME ESGレポート',
-    reportSub:          'A4一枚・償却証明書付き PDF',
-    generatePDF:        '⬇ PDFレポートを生成',
-    retiredSuccess:     '✅ 償却シミュレーション完了',
-    txIdLabel:          'トランザクションID',
-    projectLabel:       'プロジェクト',
-    serialLabel:        'シリアル番号',
-    tonnesLabel:        '償却量',
-    totalCostLabel:     '合計費用',
-    retireDateLabel:    '償却日',
-    beneficiaryLabel:   '受益者',
-    simNote:            'シミュレーション · 本番では Regen Network MCP / Verra レジストリに接続',
-    retired:            '✓ 償却済み',
-    livePreview:        'リアルタイムプレビュー',
-    previewEmpty:       'フォームに入力するとフットプリント推定値がここに表示されます。',
-    totalFootprint:     '合計フットプリント',
-    scope1Direct:       'スコープ1 — 直接排出',
-    scope2Elec:         'スコープ2 — 電力',
-    scope3Supply:       'スコープ3 — サプライチェーン',
-    offsetCostAt:       'オフセット費用 @ ',
-    totalAnnual:        '年間推定カーボンフットプリント',
-    scope123:           'スコープ1+2+3 · ',
-    industryAvg:        '業種平均算定方法',
-    emFactor:           '排出原単位',
-    perRevM:            '売上高100万ドル当たり',
-    perEmployee:        '従業員一人当たり',
-    perPerson:          'tCO₂e / 人 / 年',
-    revIntensity:       '売上高原単位',
-    perRevM2:           '売上高100万ドル当たり',
-    welcomeTitle:       'ESGカーボンエージェント稼働中。',
-    welcomeBody:        'カーボンクレジットのライフサイクル全体を管理します — 調査、ポートフォリオ、書類作成、モニタリング。GHGインベントリのない中小企業には、サイドバーの <code>🌱 スターターパッケージ</code> をご利用ください。',
-    profServices:       '専門サービス',
-    retail:             '小売',
-    manufacturing:      '製造業',
-    logistics:          '物流',
-    restaurant:         '飲食・フード',
-    construction:       '建設',
-    healthcare:         '医療',
-    other:              'その他',
-    windName:           'インド風力発電',
-    landfillName:       '米国埋立地ガス',
-    pdfBadge:           'VSME準拠 · スターターパッケージ · 中小企業向け',
-    pdfTitle:           'ESGカーボンフットプリント・オフセットレポート',
-    pdfFwLabel:         ' フレームワーク',
-    pdfStarterReport:   'スターターパッケージレポート',
-    pdfCompanyProfile:  '1. 会社概要',
-    pdfCompanyName:     '会社名',
-    pdfIndustry:        '業種',
-    pdfRevenue:         '年間売上高（USD）',
-    pdfEmployees:       '従業員数',
-    pdfYear:            '報告年度',
-    pdfFramework:       '報告フレームワーク',
-    pdfReportDate:      'レポート作成日',
-    pdfGHGTitle:        '2. GHG排出量推定値',
-    pdfScope1:          'スコープ1',
-    pdfScope2:          'スコープ2',
-    pdfScope3:          'スコープ3',
-    pdfS1Source:        '固定燃焼・車両・製造プロセス',
-    pdfS2Source:        '購入電力・熱',
-    pdfS3Source:        'サプライチェーン・出張・廃棄物',
-    pdfS1Method:        '売上高ベース業種原単位（15%）',
-    pdfS2MethodElec:    '電気代 ÷ $0.12/kWh × 0.3 kg CO₂/kWh',
-    pdfS2MethodAvg:     '業種平均（合計の25%）',
-    pdfS3Method:        '売上高ベース残余',
-    pdfTotalGross:      '総排出量',
-    pdfOffsetTitle:     '3. カーボンオフセットプログラム',
-    pdfCertTitle:       '🏆 カーボンクレジット償却証明書',
-    pdfCertBene:        '受益者',
-    pdfCertProject:     'プロジェクト',
-    pdfCertRegistry:    'レジストリ',
-    pdfCertVolume:      '償却量',
-    pdfCertVintage:     'ヴィンテージ年',
-    pdfCertSerial:      'シリアル番号',
-    pdfCertTxId:        'トランザクションID',
-    pdfCertDate:        '償却日',
-    pdfCertPurpose:     '目的',
-    pdfCertPurposeVal:  'スコープ1、2、3排出量の自主的オフセット FY',
-    pdfCertNote:        'これらのカーボンクレジットは永久に償却され、再販・譲渡はできません。本番環境ではRegen Network / Verraレジストリのトランザクション記録にリンクされます。',
-    pdfNetTitle:        '4. ネット排出量',
-    pdfGross:           '総排出量',
-    pdfLessOffsets:     '控除：認証済みオフセット償却量',
-    pdfNetEmissions:    'ネット排出量',
-    pdfCarbonNeutral:   '0.0 tCO₂e — カーボンニュートラル',
-    pdfTotalInvest:     'オフセット総投資額',
-    pdfVsme:            '📋 VSME準拠声明\n本レポートは、中小企業向けVSME（任意中小企業）基準に準拠しており、温室効果ガス排出量とオフセット活動の簡易かつ信頼性のある評価を提供します。算定方法はGHGプロトコル企業基準のスコープ1、2、3の分類に従っています。',
-    pdfFooter:          'ESGカーボンエージェント生成 — 自動カーボン管理プラットフォーム\n本レポートは、デモおよび計画目的のために業種平均排出原単位を使用して作成されました。正式な規制上の開示には、活動ベースのデータ収集とサードパーティによる検証を推奨します。\nレポート作成日：',
-    pdfFooterSuffix:    ' · 数値はすべてCO₂換算メートルトン（tCO₂e）',
-    pdfScopeLabel1:     'スコープ1 · tCO₂e\n直接排出',
-    pdfScopeLabel2:     'スコープ2 · tCO₂e\n電力',
-    pdfScopeLabel3:     'スコープ3 · tCO₂e\nバリューチェーン',
-    pdfColProject:      'プロジェクト',pdfColRegistry:'レジストリ',pdfColType:'種別',pdfColVintage:'年度',pdfColTonnes:'トン数',pdfColPrice:'単価/t',pdfColCost:'合計費用',
-    pdfColScope:'スコープ',pdfColSource:'排出源',pdfColMethod:'算定方法',pdfColTCO2:'tCO₂e',
-    employees2:         '名',
-    annualRevenue2:     '年間売上高',
-  }
-};
-
-function t(key){ return (T[currentLang] && T[currentLang][key]) || T['en'][key] || key; }
-
-function setLang(lang) {
-  currentLang = lang;
-  document.getElementById('btn-en').classList.toggle('active', lang==='en');
-  document.getElementById('btn-ja').classList.toggle('active', lang==='ja');
-  applyTranslations();
-}
-
-function applyTranslations() {
-  const l = currentLang;
-  // Header
-  document.getElementById('hdr-status').textContent = t('agentOnline');
-  // Sidebar nav items (by data-key)
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.dataset.i18n);
-  });
-  // Mode pills
-  document.querySelectorAll('[data-i18n-html]').forEach(el => {
-    el.innerHTML = t(el.dataset.i18nHtml);
-  });
-  // Starter step tracker
-  document.getElementById('sstep-1').childNodes[1].textContent = t('step1Label');
-  document.getElementById('sstep-2').childNodes[1].textContent = t('step2Label');
-  document.getElementById('sstep-3').childNodes[1].textContent = t('step3Label');
-  // Step 1 form
-  const s1 = document.getElementById('s-step1');
-  if(s1) {
-    s1.querySelector('.form-section-title').textContent = t('clientInfo');
-    s1.querySelector('.form-section-sub').textContent   = t('step1Sub');
-    // Labels
-    const labels = s1.querySelectorAll('.field-label');
-    if(labels[0]) labels[0].innerHTML = t('clientName') + ' <span>*</span>';
-    if(labels[1]) labels[1].innerHTML = t('industrySector') + ' <span>*</span>';
-    if(labels[2]) labels[2].innerHTML = t('annualRevenue') + ' <span>*</span>';
-    if(labels[3]) labels[3].innerHTML = t('numEmployees') + ' <span>*</span>';
-    if(labels[4]) labels[4].innerHTML = t('elecBill') + ' <span style="color:var(--text-muted)">' + t('elecBillOpt') + '</span>';
-    if(labels[5]) labels[5].textContent = t('reportingYear');
-    if(labels[6]) labels[6].textContent = t('esgFramework');
-    // Placeholders
-    const nameInput = document.getElementById('f-name');
-    if(nameInput) nameInput.placeholder = t('clientNamePh');
-    const revInput = document.getElementById('f-revenue');
-    if(revInput) revInput.placeholder = t('revenuePh');
-    const empInput = document.getElementById('f-employees');
-    if(empInput) empInput.placeholder = t('employeesPh');
-    const elecInput = document.getElementById('f-electricity');
-    if(elecInput) elecInput.placeholder = t('elecPh');
-    // Hints
-    const hints = s1.querySelectorAll('.field-hint');
-    if(hints[0]) hints[0].textContent = t('revenueHint');
-    if(hints[1]) hints[1].textContent = t('elecHint');
-    // Industry dropdown
-    const sel = document.getElementById('f-industry');
-    if(sel) {
-      const opts = sel.options;
-      if(opts[0]) opts[0].textContent = t('selectIndustry');
-      if(opts[1]) opts[1].textContent = t('profServices');
-      if(opts[2]) opts[2].textContent = t('retail');
-      if(opts[3]) opts[3].textContent = t('manufacturing');
-      if(opts[4]) opts[4].textContent = t('logistics');
-      if(opts[5]) opts[5].textContent = t('restaurant');
-      if(opts[6]) opts[6].textContent = t('construction');
-      if(opts[7]) opts[7].textContent = t('healthcare');
-      if(opts[8]) opts[8].textContent = t('other');
-    }
-    // Button + hint
-    const btns = s1.querySelectorAll('.starter-btn');
-    if(btns[0]) btns[0].textContent = t('calcFootprint');
-    const hint = s1.querySelector('span[style]');
-    if(hint) hint.textContent = t('usesAvg');
-  }
-  // Step 2
-  const s2 = document.getElementById('s-step2');
-  if(s2) {
-    const titles = s2.querySelectorAll('.form-section-title');
-    if(titles[0]) titles[0].textContent = t('estFootprint');
-    if(titles[1]) titles[1].textContent = t('methNote');
-    const methEl = s2.querySelector('[id="meth-text"]');
-    if(methEl) methEl.innerHTML = t('methText').replace(/\n/g,'<br>') + '<br><span style="color:var(--amber);">' + t('methWarn') + '</span>';
-    const btns = s2.querySelectorAll('.starter-btn');
-    if(btns[0]) btns[0].textContent = t('back');
-    if(btns[1]) btns[1].textContent = t('selectOffsets');
-  }
-  // Step 3
-  const s3 = document.getElementById('s-step3');
-  if(s3) {
-    const titles = s3.querySelectorAll('.form-section-title');
-    if(titles[0]) titles[0].textContent = t('selectCredits');
-    if(titles[1]) titles[1].textContent = t('vsmeReport');
-    const subs = s3.querySelectorAll('.form-section-sub');
-    if(subs[0]) subs[0].textContent = t('step3Sub');
-    if(subs[1]) subs[1].textContent = t('reportSub');
-    // Credit names
-    const windCard = document.getElementById('cc-wind');
-    if(windCard) windCard.querySelector('.credit-name').textContent = t('windName');
-    const lfCard = document.getElementById('cc-landfill');
-    if(lfCard) lfCard.querySelector('.credit-name').textContent = t('landfillName');
-    // Cost label
-    const costLabel = document.querySelector('.result-card.green-card .result-label');
-    if(costLabel) costLabel.textContent = t('totalOffsetCost');
-    // Retire btn (only if not already retired)
-    const retireBtn = document.getElementById('retire-btn');
-    if(retireBtn && !S.retired) retireBtn.textContent = t('simulateBtn');
-    // Regen note
-    const regenNote = s3.querySelector('.starter-btn + div');
-    if(regenNote) regenNote.textContent = t('regenNote');
-    // PDF btn
-    const pdfBtn = document.getElementById('pdf-btn');
-    if(pdfBtn) pdfBtn.textContent = t('generatePDF');
-    // Back btn
-    const btns = s3.querySelectorAll('.starter-btn');
-    if(btns[0]) btns[0].textContent = t('back');
-    // Update offset sub-text if calculated
-    if(S.total) updateOffsetCost();
-  }
-  // Preview panel title
-  const prevTitle = document.querySelector('.preview-title');
-  if(prevTitle) prevTitle.textContent = t('livePreview');
-  // Context sidebar titles
-  const ctxTitles = document.querySelectorAll('.context-title');
-  ctxTitles.forEach((el,i) => {
-    if(i===0) el.textContent = t('sessionCtx');
-    if(i===1) el.textContent = t('starterCtx');
-  });
-  // Pipeline titles
-  const pipeTitles = document.querySelectorAll('.pipeline-title');
-  pipeTitles.forEach((el,i) => {
-    if(i===0) el.textContent = t('phasePipeline');
-    if(i===1) el.textContent = t('starterPipeline');
-  });
-  // Pipeline labels (chat panel)
-  const lbResearch = document.getElementById('lbl-research'); if(lbResearch) lbResearch.textContent = t('phaseResearch');
-  const lbPort = document.getElementById('lbl-portfolio');   if(lbPort) lbPort.textContent = t('phasePortfolio');
-  const lbDocs = document.getElementById('lbl-docs');        if(lbDocs) lbDocs.textContent = t('phaseDocs');
-  const lbMon  = document.getElementById('lbl-monitor');     if(lbMon)  lbMon.textContent  = t('phaseMonitor');
-  // Starter pipeline labels
-  const slCollect  = document.getElementById('slbl-collect');  if(slCollect)  slCollect.textContent  = t('dataCollection');
-  const slEstimate = document.getElementById('slbl-estimate'); if(slEstimate) slEstimate.textContent = t('footprintEst');
-  const slOffset   = document.getElementById('slbl-offset');   if(slOffset)   slOffset.textContent   = t('offsetReport');
-  // Context keys (chat panel)
-  const chatCtxKeys = document.querySelectorAll('#panel-chat .context-key');
-  const chatKeyMap = ['client','mode','volume','budget','framework'];
-  chatCtxKeys.forEach((el,i) => { if(chatKeyMap[i]) el.textContent = t(chatKeyMap[i]); });
-  // Context keys (starter panel)
-  const starterCtxKeys = document.querySelectorAll('#panel-starter .context-key');
-  const starterKeyMap = ['client','industry','revenue','employees','estTonnes','offsetCost'];
-  starterCtxKeys.forEach((el,i) => { if(starterKeyMap[i]) el.textContent = t(starterKeyMap[i]); });
-  // Refresh live preview if data already entered
-  if(S.total) livePreview();
-  // Refresh footprint results if on step 2
-  if(S.step===2) renderFootprint();
-}
-
+</script>
 </body>
 </html>
